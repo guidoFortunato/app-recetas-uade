@@ -1,11 +1,8 @@
-import { Text, View } from "react-native";
+import useAuthStore from "@/store/store";
+import { Redirect } from "expo-router";
+
 const RecetasApp = () => {
-  return (
-    <View className="mt-10 mx-2.5">
-      <Text className="text-2xl font-work-black text-primary">Recetas App</Text>
-      <Text className="text-2xl font-work-light">Recetas App</Text>
-      <Text className="text-2xl font-work-medium">Recetas App</Text>
-    </View>
-  );
+  const { isAuthenticated } = useAuthStore();
+  return isAuthenticated ? <Redirect href="/tabs/home" /> : <Redirect href="/auth/login" />;
 };
 export default RecetasApp;

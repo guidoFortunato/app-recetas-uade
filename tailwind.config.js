@@ -20,6 +20,15 @@ module.exports = {
         },
         tertiary: "#ef2967",
       },
+      backgroundColor: {
+        primary: "#49129c",
+        secondary: {
+          DEFAULT: "#B40086",
+          100: "#c51297",
+          200: "#831266",
+        },
+        tertiary: "#ef2967",
+      },
 
       fontFamily: { 
         "work-light": ["work-light", "sans-serif"],
