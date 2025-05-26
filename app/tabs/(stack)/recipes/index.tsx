@@ -1,6 +1,7 @@
 import { SearchBar } from "@/components/searchBar";
 import useProductsStore from "@/store/productsStore";
 import { Ionicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
 import React, { useState } from "react";
 import {
   Dimensions,
@@ -115,7 +116,12 @@ const RecipesScreen = () => {
       >
         <View className="flex-row flex-wrap justify-between">
           {recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
+            <Link
+              href={`/tabs/(stack)/recipes/${recipe.id}`}
+              key={recipe.id}
+            >
+              <RecipeCard key={recipe.id} recipe={recipe} />
+            </Link>
           ))}
         </View>
       </ScrollView>

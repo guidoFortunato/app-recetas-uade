@@ -183,7 +183,12 @@ const HomeScreen = () => {
             contentContainerStyle={{ paddingRight: 16 }}
           >
             {recipes.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} />
+              <Link
+                href={`/tabs/(stack)/recipes/${recipe.id}`}
+                key={recipe.id}
+              >
+                <RecipeCard key={recipe.id} recipe={recipe} />
+              </Link>
             ))}
           </ScrollView>
         </View>
