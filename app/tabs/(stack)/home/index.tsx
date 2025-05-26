@@ -26,7 +26,7 @@ const HomeScreen = () => {
 
     return (
       <TouchableOpacity
-        className="mb-4 bg-white rounded-xl shadow-sm"
+        className="mb-4 bg-white rounded-xl shadow-sm mr-3"
         style={{ width: cardWidth }}
         activeOpacity={0.7}
       >

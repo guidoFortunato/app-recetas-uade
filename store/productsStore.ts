@@ -154,6 +154,24 @@ const useProductsStore = create<ProductsState>((set) => ({
         "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200&h=200&fit=crop&crop=center",
       isBookmarked: false,
     },
+    {
+      id: 5,
+      name: "Napolitana",
+      author: "Carlos Rodríguez",
+      rating: 8.9,
+      image:
+        "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=200&h=200&fit=crop&crop=center",
+      isBookmarked: false,
+    },
+    {
+      id: 6,
+      name: "Vegetariana",
+      author: "Laura Martínez",
+      rating: 9.2,
+      image:
+        "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=200&h=200&fit=crop&crop=center",
+      isBookmarked: false,
+    },
   ],
 }));
 

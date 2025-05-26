@@ -29,7 +29,7 @@ const TabsLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="create/index"
+        name="create/index"        
         options={{
           title: "Crear receta",
           tabBarIcon: ({ color }) => (
