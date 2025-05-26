@@ -13,8 +13,8 @@ const StackLayout = () => {
       <Stack.Screen
         name="home/index"
         options={{
-          title: "",
-          // headerShown: false,
+          title: "Home Stack",
+          headerShown: false,
           animation: "slide_from_right",
         }}
       />

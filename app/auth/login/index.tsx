@@ -46,7 +46,7 @@ const AuthScreen = () => {
     }
 
     login(user);
-    router.replace("/home");
+    router.replace("/tabs/(stack)/home");
 
   };
 
