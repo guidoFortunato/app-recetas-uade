@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface User {
   id: number;
@@ -19,17 +19,20 @@ const useAuthStore = create<AuthState>()((set) => ({
   // user: null,
   isAuthenticated: true,
   isLoading: false,
-  login: (userData: User) => set({ 
-    // user: userData, 
-    isAuthenticated: true 
-  }),
-  logout: () => set({ 
-    // user: null, 
-    isAuthenticated: false 
-  }),
-  setLoading: (loading: boolean) => set({ 
-    isLoading: loading 
-  }),
-}))
+  login: (userData: User) =>
+    set({
+      // user: userData,
+      isAuthenticated: true,
+    }),
+  logout: () =>
+    set({
+      // user: null,
+      isAuthenticated: false,
+    }),
+  setLoading: (loading: boolean) =>
+    set({
+      isLoading: loading,
+    }),
+}));
 
 export default useAuthStore;

@@ -1,50 +1,60 @@
-# Welcome to your Expo app 👋
+# Recetas App 🍳
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Una aplicación móvil moderna para descubrir, guardar y compartir tus recetas favoritas.
 
-## Get started
+## Características ✨
 
-1. Install dependencies
+- 📱 Interfaz moderna y atractiva
+- 🔍 Búsqueda de recetas
+- 📑 Categorización de recetas
+- 🔖 Sistema de marcadores para guardar recetas favoritas
+- 🎨 Diseño responsivo con Tailwind CSS
+- 🌐 Soporte multiplataforma (iOS, Android)
 
+## Tecnologías Utilizadas 🛠
+
+- [Expo](https://expo.dev/) - Framework para desarrollo móvil
+- [React Native](https://reactnative.dev/) - Framework para desarrollo de aplicaciones móviles
+- [NativeWind](https://www.nativewind.dev/) - Estilizado con Tailwind CSS
+- [Zustand](https://github.com/pmndrs/zustand) - Gestión de estado
+- [Expo Router](https://docs.expo.dev/router/introduction/) - Enrutamiento basado en archivos
+
+## Requisitos Previos 📋
+
+- Node.js (versión LTS recomendada)
+- npm o yarn
+- Expo CLI
+- iOS Simulator (para Mac) o Android Studio (para emulación en Android)
+
+## Instalación 🚀
+
+1. Clona el repositorio:
+   ```bash
+   git clone [URL_DEL_REPOSITORIO]
+   cd recetas-app
+   ```
+
+2. Instala las dependencias:
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. Inicia la aplicación:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+## Desarrollo 💻
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+La aplicación utiliza una estructura de archivos basada en Expo Router:
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- `/app` - Contiene las rutas y páginas principales
+- `/components` - Componentes reutilizables
+- `/assets` - Recursos estáticos (imágenes, fuentes, etc.)
+- `/store` - Estado global de la aplicación
 
-## Get a fresh project
 
-When you're ready, run:
 
-```bash
-npm run reset-project
-```
+---
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Desarrollado con ❤️ usando Expo y React Native

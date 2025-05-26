@@ -20,6 +20,24 @@ const TabsLayout = () => {
         }}
       />
       <Tabs.Screen
+        name="notifications/index"
+        options={{
+          title: "Notificaciones",
+          tabBarIcon: ({ color }) => (
+            <Ionicons size={28} name="compass-outline" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="create/index"
+        options={{
+          title: "Crear receta",
+          tabBarIcon: ({ color }) => (
+            <Ionicons size={28} name="add-outline" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="favorites/index"
         options={{
           title: "Favoritos",
@@ -28,15 +46,7 @@ const TabsLayout = () => {
           ),
         }}
       />
-      <Tabs.Screen
-        name="notifications/index"
-        options={{
-          title: "Notificaciones",
-          tabBarIcon: ({ color }) => (
-            <Ionicons size={28} name="notifications-outline" color={color} />
-          ),
-        }}
-      />
+
       <Tabs.Screen
         name="profile/index"
         options={{

@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 
-import useAuthStore from "@/store/store";
+import useAuthStore from "@/store/authStore";
 import { user } from "@/utils/test/data";
 import { router } from "expo-router";
 

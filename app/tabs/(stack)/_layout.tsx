@@ -25,6 +25,13 @@ const StackLayout = () => {
           animation: "slide_from_right",
         }}
       />
+      <Stack.Screen
+        name="recipes/index"
+        options={{
+          title: "Recetas sugeridas",
+          animation: "slide_from_right",
+        }}
+      />
     </Stack>
   );
 };

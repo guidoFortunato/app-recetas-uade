@@ -1,4 +1,4 @@
-import useAuthStore from "@/store/store";
+import useAuthStore from "@/store/authStore";
 import { Redirect } from "expo-router";
 
 const RecetasApp = () => {

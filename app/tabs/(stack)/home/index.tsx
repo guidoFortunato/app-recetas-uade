@@ -1,68 +1,81 @@
 import { SearchBar } from "@/components/searchBar";
+import useProductsStore from "@/store/productsStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
+  Dimensions,
   Image,
   SafeAreaView,
   ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 
-const foodCategories = [
-  {
-    id: 1,
-    name: "Empanadas",
-    image:
-      "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=100&h=100&fit=crop&crop=center",
-  },
-  {
-    id: 2,
-    name: "Arroz",
-    image:
-      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&h=100&fit=crop&crop=center",
-  },
-  {
-    id: 3,
-    name: "Pastas",
-    image:
-      "https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?w=100&h=100&fit=crop&crop=center",
-  },
-  {
-    id: 4,
-    name: "Pizza",
-    image:
-      "https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?w=100&h=100&fit=crop&crop=center",
-  },
-];
-const suggestedRecipes = [
-  {
-    id: 1,
-    title: "Arroz con Curry",
-    author: "Guido Fortunato",
-    image:
-      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=150&fit=crop&crop=center",
-  },
-  {
-    id: 2,
-    title: "Pastel de Papa",
-    author: "Guido Fortunato",
-    image:
-      "https://images.unsplash.com/photo-1574484284002-952d92456975?w=200&h=150&fit=crop&crop=center",
-  },
-  {
-    id: 3,
-    title: "Ravioli",
-    author: "Nicolás",
-    image:
-      "https://images.unsplash.com/photo-1502741338009-cac2772e18bc?w=200&h=150&fit=crop&crop=center",
-  },
-];
+const { width } = Dimensions.get("window");
+const cardWidth = (width - 48) / 2; // 2 columns with padding
 
 const HomeScreen = () => {
+  const { productCategories, recipes } = useProductsStore();
+
+  const RecipeCard = ({ recipe }: { recipe: any }) => {
+    const [imageError, setImageError] = useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(recipe.isBookmarked);
+
+    return (
+      <TouchableOpacity
+        className="mb-4 bg-white rounded-xl shadow-sm"
+        style={{ width: cardWidth }}
+        activeOpacity={0.7}
+      >
+        <View className="relative">
+          {!imageError ? (
+            <Image
+              source={{ uri: recipe.image }}
+              className="w-full h-32 rounded-t-xl"
+              resizeMode="cover"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            // Fallback con icono de pizza
+            <View className="w-full h-32 rounded-t-xl bg-orange-100 items-center justify-center">
+              <Ionicons name="pizza-outline" size={40} color="#FB923C" />
+            </View>
+          )}
+
+          {/* Bookmark button */}
+          <TouchableOpacity
+            className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full items-center justify-center shadow-sm"
+            onPress={() => setIsBookmarked(!isBookmarked)}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name={isBookmarked ? "bookmark" : "bookmark-outline"}
+              size={16}
+              color={isBookmarked ? "#000" : "#666"}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View className="p-3">
+          <Text className="text-xs text-gray-500 mb-1">{recipe.author}</Text>
+          <Text className="text-sm font-semibold text-gray-800 mb-2">
+            {recipe.name}
+          </Text>
+
+          <View className="flex-row items-center">
+            <Ionicons name="star" size={14} color="#FFD700" />
+            <Text className="text-sm font-medium text-gray-700 ml-1">
+              {recipe.rating}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white mt-10">
       <StatusBar barStyle="dark-content" backgroundColor="white" />
@@ -132,7 +145,7 @@ const HomeScreen = () => {
             className="px-4"
             contentContainerStyle={{ paddingRight: 16 }}
           >
-            {foodCategories.map((category) => (
+            {productCategories.map((category) => (
               <TouchableOpacity key={category.id} className="items-center mr-6">
                 <Image
                   source={{ uri: category.image }}
@@ -153,12 +166,14 @@ const HomeScreen = () => {
             <Text className="text-lg font-bold text-gray-800">
               Recetas Sugeridas
             </Text>
-            <Ionicons
-              className="ml-2"
-              name="chevron-forward-circle-outline"
-              size={20}
-              color="#9CA3AF"
-            />
+            <Link href="/tabs/(stack)/recipes" className="ml-2">
+              <Ionicons
+                className="ml-2"
+                name="chevron-forward-circle-outline"
+                size={20}
+                color="#9CA3AF"
+              />
+            </Link>
           </View>
 
           <ScrollView
@@ -167,20 +182,8 @@ const HomeScreen = () => {
             className="px-4"
             contentContainerStyle={{ paddingRight: 16 }}
           >
-            {suggestedRecipes.map((recipe) => (
-              <TouchableOpacity key={recipe.id} className="mr-4 w-48">
-                <Image
-                  source={{ uri: recipe.image }}
-                  className="w-full h-32 rounded-xl mb-3"
-                  resizeMode="cover"
-                />
-                <Text className="text-xs text-gray-500 mb-1">
-                  {recipe.author}
-                </Text>
-                <Text className="text-sm font-semibold text-gray-800">
-                  {recipe.title}
-                </Text>
-              </TouchableOpacity>
+            {recipes.map((recipe) => (
+              <RecipeCard key={recipe.id} recipe={recipe} />
             ))}
           </ScrollView>
         </View>
