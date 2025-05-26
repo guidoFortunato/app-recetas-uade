@@ -1,4 +1,6 @@
+import { SearchBar } from "@/components/searchBar";
 import { Ionicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
 import React from "react";
 import {
   Image,
@@ -6,9 +8,8 @@ import {
   ScrollView,
   StatusBar,
   Text,
-  TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 const foodCategories = [
@@ -34,7 +35,7 @@ const foodCategories = [
     id: 4,
     name: "Pizza",
     image:
-      "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=100&h=100&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?w=100&h=100&fit=crop&crop=center",
   },
 ];
 const suggestedRecipes = [
@@ -63,20 +64,13 @@ const suggestedRecipes = [
 
 const HomeScreen = () => {
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white mt-10">
       <StatusBar barStyle="dark-content" backgroundColor="white" />
 
       {/* Header */}
       <View className="px-4 pt-2">
         {/* Search Bar */}
-        <View className="flex-row items-center bg-gray-100 rounded-lg px-3 py-3 mb-4">
-          <Ionicons name="search-outline" size={20} color="#9CA3AF" />
-          <TextInput
-            placeholder="Search"
-            className="flex-1 ml-2 text-gray-600"
-            placeholderTextColor="#9CA3AF"
-          />
-        </View>
+        <SearchBar />
 
         {/* Navigation Tabs */}
         <View className="flex-row items-center mb-6 gap-4">
@@ -100,7 +94,7 @@ const HomeScreen = () => {
       <ScrollView className="flex-1">
         {/* Featured Recipe Card */}
         <View className="mx-4 mb-10">
-          <TouchableOpacity className="bg-gray-50 rounded-2xl p-4 flex-row items-center">
+          <TouchableOpacity className="bg-gray-100 rounded-2xl p-4 flex-row items-center">
             <View className="flex-1">
               <Text className="text-xl font-bold text-gray-800 mb-1">
                 Recetas con
@@ -123,12 +117,13 @@ const HomeScreen = () => {
             <Text className="text-lg font-bold text-gray-800">
               Platos de Comida
             </Text>
-            <Ionicons
-              className="ml-2"
-              name="chevron-forward-circle-outline"
-              size={20}
-              color="#9CA3AF"
-            />
+            <Link href="/tabs/(stack)/categories" className="ml-2">
+              <Ionicons
+                name="chevron-forward-circle-outline"
+                size={20}
+                color="#9CA3AF"
+              />
+            </Link>
           </View>
 
           <ScrollView

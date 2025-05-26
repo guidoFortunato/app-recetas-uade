@@ -18,6 +18,13 @@ const StackLayout = () => {
           animation: "slide_from_right",
         }}
       />
+      <Stack.Screen
+        name="categories/index"
+        options={{
+          title: "Categorías de productos",
+          animation: "slide_from_right",
+        }}
+      />
     </Stack>
   );
 };
