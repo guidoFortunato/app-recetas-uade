@@ -50,17 +50,17 @@ const RecipeDetailScreen = () => {
   const { recipes } = useProductsStore();
   const recipe = recipes.find((recipe) => recipe.id === Number(id));
 
-  console.log({recipe});
+  // console.log({ recipe });
 
   if (!recipe) {
-    console.log("Receta no encontrada");
+    console.log("Receta no encontrada")
   }
 
   useEffect(() => {
     navigation.setOptions({
       title: recipe?.name,
     });
-  }, [recipe, id, navigation] );
+  }, [recipe, id, navigation])
 
   const ingredients = [
     "250 g de masa para pizza básica",
@@ -184,8 +184,9 @@ const RecipeDetailScreen = () => {
       rating: userRating,
       description: reviewDescription,
       author: "Tu nombre",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face",
-      timeAgo: "Ahora"
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face",
+      timeAgo: "Ahora",
     };
 
     setReviews([...reviews, newReview]);
@@ -224,8 +225,6 @@ const RecipeDetailScreen = () => {
                 <Ionicons name="pizza-outline" size={60} color="#FB923C" />
               </View>
             )}
-
-          
           </View>
 
           {/* Recipe Info */}
