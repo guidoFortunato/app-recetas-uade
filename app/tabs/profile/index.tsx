@@ -1,4 +1,4 @@
-import { user } from "@/utils/test/data";
+import useAuthStore from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -16,8 +16,9 @@ const { width } = Dimensions.get("window");
 const cardWidth = (width - 48) / 2; // 2 columns with padding
 
 const UserProfileScreen = () => {
+  const { user } = useAuthStore();
   const [avatarError, setAvatarError] = useState(false);
-  const [pizzaImageError, setPizzaImageError] = useState(false);
+  // const [pizzaImageError, setPizzaImageError] = useState(false);
 
   const RecipeCard = ({ recipe }: { recipe: any }) => {
     const [imageError, setImageError] = useState(false);
@@ -79,7 +80,7 @@ const UserProfileScreen = () => {
         <View className="relative mb-8">
           {/* Rectangulo gris del usuario */}
           <View className="bg-gray-200 h-32 mx-4 rounded-2xl flex-row items-center justify-end relative mt-4">
-           {/* //Todo Imagen de fondo del perfil */}
+            {/* //Todo Imagen de fondo del perfil */}
           </View>
 
           {/* User Avatar - Positioned below y sobre el rectángulo gris */}
@@ -94,7 +95,12 @@ const UserProfileScreen = () => {
                   onError={() => setAvatarError(true)}
                 />
                 <TouchableOpacity className="ml-2" activeOpacity={0.7}>
-                  <Ionicons name="pencil-outline" size={20} color="#666" />
+                  <Ionicons
+                    name="pencil-outline"
+                    size={20}
+                    color="#666"
+                    onPress={() => alert("Editar perfil")}
+                  />
                 </TouchableOpacity>
               </View>
             ) : (
