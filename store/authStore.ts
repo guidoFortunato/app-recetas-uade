@@ -1,32 +1,108 @@
 import { create } from "zustand";
 
+interface Recipe {
+  id: number;
+  name: string;
+  rating: number;
+  image: string;
+  hasExternalLink: boolean;
+}
+
 interface User {
   id: number;
   email: string;
   password: string;
+  code: string;
+  name: string;
+  avatar: string;
+  pizzaImage: string;
+  recipes: Recipe[];
 }
 
+// Datos de prueba
+const user: User = {
+  id: 1,
+  email: "test@test.com",
+  password: "123456",
+  code: "5",
+  name: "Nicolas Alvarez",
+  avatar:
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
+  pizzaImage:
+    "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=300&h=180&fit=crop&crop=center",
+  recipes: [
+    {
+      id: 1,
+      name: "Pizza Pepperoni",
+      rating: 9.8,
+      image:
+        "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=200&h=150&fit=crop&crop=center",
+      hasExternalLink: true,
+    },
+    {
+      id: 2,
+      name: "Pasta Carbonara",
+      rating: 9.6,
+      image:
+        "https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?w=200&h=150&fit=crop&crop=center",
+      hasExternalLink: true,
+    },
+    {
+      id: 3,
+      name: "Sopa de Calabaza",
+      rating: 8.4,
+      image:
+        "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=200&h=150&fit=crop&crop=center",
+      hasExternalLink: true,
+    },
+    {
+      id: 4,
+      name: "Sushi Roll",
+      rating: 9.2,
+      image:
+        "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=200&h=150&fit=crop&crop=center",
+      hasExternalLink: true,
+    },
+  ],
+};
+
 interface AuthState {
-  // user: User | null;
+  user: User;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isPassRecovery: boolean;
   login: (userData: User) => void;
+  passRecovery: (email: string) => void;
+  updatePassword: (newPassword: string) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
 }
 
 const useAuthStore = create<AuthState>()((set) => ({
-  // user: null,
-  isAuthenticated: true,
+  user,
+  isAuthenticated: false,
   isLoading: false,
+  isPassRecovery: false,
   login: (userData: User) =>
     set({
-      // user: userData,
+      user: userData,
       isAuthenticated: true,
+    }),
+  passRecovery: (email: string) =>
+    set({
+      isPassRecovery: true,
+    }),
+  updatePassword: (newPassword: string) =>
+    set((state) => {
+      // Actualizar el usuario en el store
+      const updatedUser = { ...state.user, password: newPassword };
+
+      return {
+        user: updatedUser,
+      };
     }),
   logout: () =>
     set({
-      // user: null,
       isAuthenticated: false,
     }),
   setLoading: (loading: boolean) =>

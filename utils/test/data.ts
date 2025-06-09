@@ -2,6 +2,7 @@ export const user = {
   id: 1,
   email: "test@test.com",
   password: "123456",
+  code: "1",
   name: "Nicolas Alvarez",
   avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
   pizzaImage: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=300&h=180&fit=crop&crop=center",
