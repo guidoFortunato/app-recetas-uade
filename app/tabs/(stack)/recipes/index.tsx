@@ -64,7 +64,7 @@ const RecipesScreen = () => {
               href={`/tabs/(stack)/recipes/${recipe.id}`}
               key={recipe.id}
             >
-              <RecipeCard key={recipe.id} recipe={recipe} cardWidth={cardWidth} />
+              <RecipeCard key={recipe.id} {...recipe} />
             </Link>
           ))}
         </View>

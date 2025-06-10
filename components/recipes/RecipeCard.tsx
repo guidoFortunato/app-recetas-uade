@@ -26,7 +26,6 @@ export const RecipeCard = ({
   icon = "bookmark-outline",
   iconFill = "bookmark",
 }: Recipe) => {
-  const [imageError, setImageError] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(bookmarked || false);
 
   return (
@@ -35,19 +34,11 @@ export const RecipeCard = ({
       style={{ width: cardWidth }}
     >
       <View className="relative">
-        {!imageError ? (
-          <Image
-            source={{ uri: image }}
-            className="w-full h-32 rounded-t-xl"
-            resizeMode="cover"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          // Fallback con icono de pizza
-          <View className="w-full h-32 rounded-t-xl bg-orange-100 items-center justify-center">
-            <Ionicons name="pizza-outline" size={40} color="#FB923C" />
-          </View>
-        )}
+        <Image
+          source={{ uri: image }}
+          className="w-full h-32 rounded-t-xl"
+          resizeMode="cover"
+        />
 
         {/* Bookmark button */}
         <TouchableOpacity
@@ -65,9 +56,7 @@ export const RecipeCard = ({
 
       <View className="p-3">
         <Text className="text-xs text-gray-500 mb-1">{author}</Text>
-        <Text className="text-sm font-semibold text-gray-800 mb-2">
-          {name}
-        </Text>
+        <Text className="text-sm font-semibold text-gray-800 mb-2">{name}</Text>
 
         <View className="flex-row items-center">
           <Ionicons name="star" size={14} color="#FFD700" />

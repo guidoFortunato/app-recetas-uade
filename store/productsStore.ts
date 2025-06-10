@@ -16,9 +16,12 @@ interface Recipe {
 interface ProductsState {
   productCategories: ProductCategory[];
   recipes: Recipe[];
+  searchQuery: string;
+  handleSearchQuery: (query: string) => void;
 }
 
 const useProductsStore = create<ProductsState>((set) => ({
+  searchQuery: "",  
   productCategories: [
     {
       id: 1,
@@ -173,6 +176,8 @@ const useProductsStore = create<ProductsState>((set) => ({
       isBookmarked: false,
     },
   ],
+
+  handleSearchQuery: (query: string) => set({ searchQuery: query }),
 }));
 
 export default useProductsStore;

@@ -3,7 +3,6 @@ import useAuthStore from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  Dimensions,
   Image,
   SafeAreaView,
   ScrollView,
@@ -12,9 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-const { width } = Dimensions.get("window");
-const cardWidth = (width - 48) / 2; // 2 columns with padding
 
 const UserProfileScreen = () => {
   const { user } = useAuthStore();

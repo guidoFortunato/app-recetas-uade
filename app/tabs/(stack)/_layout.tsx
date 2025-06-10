@@ -32,6 +32,13 @@ const StackLayout = () => {
           animation: "slide_from_right",
         }}
       />
+      <Stack.Screen
+        name="search/index"
+        options={{
+          title: "",
+          animation: "slide_from_right",
+        }}
+      />
     </Stack>
   );
 };
