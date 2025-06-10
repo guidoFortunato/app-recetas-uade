@@ -1,19 +1,33 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 
 interface Recipe {
   id: number;
   name: string;
-  author: string;
+  author?: string;
   rating: number;
   image: string;
-  isBookmarked?: boolean;
+  bookmarked?: boolean;
+  icon?: "bookmark-outline" | "open-outline";
+  iconFill?: "bookmark" | "open";
 }
 
-export const RecipeCard = ({ recipe, cardWidth }: { recipe: Recipe, cardWidth: number }) => {
+const { width } = Dimensions.get("window");
+const cardWidth = (width - 48) / 2;
+
+export const RecipeCard = ({
+  id,
+  name,
+  author,
+  rating,
+  image,
+  bookmarked,
+  icon = "bookmark-outline",
+  iconFill = "bookmark",
+}: Recipe) => {
   const [imageError, setImageError] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(recipe.isBookmarked || false);
+  const [isBookmarked, setIsBookmarked] = useState(bookmarked || false);
 
   return (
     <View
@@ -23,7 +37,7 @@ export const RecipeCard = ({ recipe, cardWidth }: { recipe: Recipe, cardWidth: n
       <View className="relative">
         {!imageError ? (
           <Image
-            source={{ uri: recipe.image }}
+            source={{ uri: image }}
             className="w-full h-32 rounded-t-xl"
             resizeMode="cover"
             onError={() => setImageError(true)}
@@ -42,7 +56,7 @@ export const RecipeCard = ({ recipe, cardWidth }: { recipe: Recipe, cardWidth: n
           activeOpacity={0.7}
         >
           <Ionicons
-            name={isBookmarked ? "bookmark" : "bookmark-outline"}
+            name={isBookmarked ? iconFill : icon}
             size={16}
             color={isBookmarked ? "#000" : "#666"}
           />
@@ -50,15 +64,15 @@ export const RecipeCard = ({ recipe, cardWidth }: { recipe: Recipe, cardWidth: n
       </View>
 
       <View className="p-3">
-        <Text className="text-xs text-gray-500 mb-1">{recipe.author}</Text>
+        <Text className="text-xs text-gray-500 mb-1">{author}</Text>
         <Text className="text-sm font-semibold text-gray-800 mb-2">
-          {recipe.name}
+          {name}
         </Text>
 
         <View className="flex-row items-center">
           <Ionicons name="star" size={14} color="#FFD700" />
           <Text className="text-sm font-medium text-gray-700 ml-1">
-            {recipe.rating}
+            {rating}
           </Text>
         </View>
       </View>

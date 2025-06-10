@@ -80,7 +80,7 @@ interface AuthState {
 
 const useAuthStore = create<AuthState>()((set) => ({
   user,
-  isAuthenticated: false,
+  isAuthenticated: true,
   isLoading: false,
   isPassRecovery: false,
   login: (userData: User) =>

@@ -5,18 +5,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
 import {
-  Dimensions,
   Image,
   SafeAreaView,
   ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
-const { width } = Dimensions.get("window");
-const cardWidth = (width - 48) / 2; // 2 columns with padding
 
 const HomeScreen = () => {
   const { productCategories, recipes } = useProductsStore();
@@ -135,7 +132,7 @@ const HomeScreen = () => {
                 key={recipe.id}
                 className="mr-2"
               >
-                <RecipeCard key={recipe.id} recipe={recipe} cardWidth={cardWidth} />
+                <RecipeCard key={recipe.id} {...recipe} />
               </Link>
             ))}
           </ScrollView>

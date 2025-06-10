@@ -1,3 +1,4 @@
+import { RecipeCard } from "@/components/recipes/RecipeCard";
 import useAuthStore from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
@@ -19,52 +20,6 @@ const UserProfileScreen = () => {
   const { user } = useAuthStore();
   const [avatarError, setAvatarError] = useState(false);
   // const [pizzaImageError, setPizzaImageError] = useState(false);
-
-  const RecipeCard = ({ recipe }: { recipe: any }) => {
-    const [imageError, setImageError] = useState(false);
-
-    return (
-      <TouchableOpacity
-        className="mb-4 bg-white rounded-xl shadow-sm"
-        style={{ width: cardWidth }}
-        activeOpacity={0.7}
-      >
-        <View className="relative">
-          {!imageError ? (
-            <Image
-              source={{ uri: recipe.image }}
-              className="w-full h-24 rounded-t-xl"
-              resizeMode="cover"
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <View className="w-full h-24 rounded-t-xl bg-orange-100 items-center justify-center">
-              <Ionicons name="restaurant-outline" size={30} color="#FB923C" />
-            </View>
-          )}
-
-          {/* External Link Icon */}
-          {recipe.hasExternalLink && (
-            <View className="absolute top-2 right-2 w-6 h-6 bg-white rounded-full items-center justify-center shadow-sm">
-              <Ionicons name="open-outline" size={12} color="#666" />
-            </View>
-          )}
-        </View>
-
-        <View className="p-3">
-          <Text className="text-sm font-semibold text-gray-800 mb-1">
-            {recipe.name}
-          </Text>
-          <View className="flex-row items-center">
-            <Ionicons name="star" size={12} color="#FFD700" />
-            <Text className="text-xs font-medium text-gray-700 ml-1">
-              {recipe.rating}
-            </Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -126,9 +81,9 @@ const UserProfileScreen = () => {
           </View>
         </View>
 
-        {/* Recipes Section */}
+        {/* Sección recetas */}
         <View className="px-4">
-          {/* Section Header */}
+          {/* Header */}
           <View className="flex-row items-center justify-between mb-4">
             <Text className="text-lg font-bold text-gray-800">Tus Recetas</Text>
             <View className="flex-row">
@@ -147,7 +102,12 @@ const UserProfileScreen = () => {
           {/* Recipes Grid */}
           <View className="flex-row flex-wrap justify-between mb-24">
             {user.recipes.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} />
+              <RecipeCard
+                key={recipe.id}
+                icon="open-outline"
+                iconFill="open"
+                {...recipe}
+              />
             ))}
           </View>
         </View>
