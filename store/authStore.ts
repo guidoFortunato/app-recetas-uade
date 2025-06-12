@@ -123,7 +123,7 @@ interface AuthState {
 const useAuthStore = create<AuthState>()((set) => ({
   user,
   searchUsers,
-  isAuthenticated: true,
+  isAuthenticated: false,
   isLoading: false,
   isPassRecovery: false,
   login: (userData: User) =>

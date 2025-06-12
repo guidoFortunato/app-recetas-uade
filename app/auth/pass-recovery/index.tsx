@@ -8,6 +8,7 @@ import {
 } from "react-native";
 
 import useAuthStore from "@/store/authStore";
+import { isValidEmail } from "@/utils/emailValidator";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
@@ -27,6 +28,10 @@ const PassRecoveryScreen = () => {
     }
 
     if (step === 0) {
+      if (!isValidEmail(email)) {
+        alert("Ingrese un correo electrónico válido");
+        return;
+      }
       setStep(1);
       return;
     }

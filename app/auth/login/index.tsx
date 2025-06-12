@@ -8,6 +8,7 @@ import {
 } from "react-native";
 
 import useAuthStore from "@/store/authStore";
+import { isValidEmail } from "@/utils/emailValidator";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
@@ -18,10 +19,14 @@ const AuthScreen = () => {
   const [password, setPassword] = useState(user.password);
   const [step, setStep] = useState(0);
 
-
   const handleLogin = () => {
     if (!email.trim()) {
       alert("Ingrese su correo electrónico para continuar");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      alert("Ingrese un correo electrónico válido");
       return;
     }
 
