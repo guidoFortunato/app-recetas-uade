@@ -1,6 +1,3 @@
-import { RecipeCard } from "@/components/recipes/RecipeCard";
-import useAuthStore from "@/store/authStore";
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -14,8 +11,12 @@ import {
   View,
 } from "react-native";
 
+import { RecipeCard } from "@/components/recipes/RecipeCard";
+import useAuthStore from "@/store/authStore";
+import { Ionicons } from "@expo/vector-icons";
+
 const UserProfileScreen = () => {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const [avatarError, setAvatarError] = useState(false);
 
   const handleLogoutPress = () => {
@@ -28,7 +29,7 @@ const UserProfileScreen = () => {
           text: "Cerrar sesión",
           style: "destructive",
           onPress: () => {
-            useAuthStore.getState().logout();
+            logout();
             router.replace("/auth/login");
           },
         },
@@ -42,7 +43,7 @@ const UserProfileScreen = () => {
       <StatusBar barStyle="dark-content" backgroundColor="white" />
 
       {/* Header */}
-      <View className="px-4 py-4 border-b border-gray-200 flex-row items-center justify-between">
+      <View className="px-4 py-4 border-b border-gray-200 flex-row items-center justify-between mt-5">
         <Text className="text-xl font-bold text-gray-800 text-center flex-1">
           Perfil del usuario
         </Text>
@@ -86,7 +87,9 @@ const UserProfileScreen = () => {
         {/* User Info */}
         <View className="px-4 mb-6 mt-2">
           <View className="flex-row items-center justify-between">
-            <Text className="text-2xl font-bold text-gray-800">{user.name}</Text>
+            <Text className="text-2xl font-bold text-gray-800">
+              {user.name}
+            </Text>
             <View className="flex-row items-center">
               <Ionicons name="star" size={18} color="#FFD700" />
               <Text className="text-lg font-semibold text-gray-800 ml-1">
