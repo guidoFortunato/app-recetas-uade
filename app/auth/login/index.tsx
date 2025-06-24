@@ -105,7 +105,15 @@ const AuthScreen = () => {
             className="text-sm text-neutral-500 underline"
             onPress={() => router.push("/auth/pass-recovery")}
           >
-            Olvidaste tu contraseña?
+            ¿Olvidaste tu contraseña?
+          </Text>
+        </View>
+        <View className="flex flex-row justify-center">
+          <Text
+            className="text-sm text-neutral-500 underline"
+            onPress={() => router.push("/auth/register")}
+          >
+            ¿No tenés cuenta?
           </Text>
         </View>
       </View>

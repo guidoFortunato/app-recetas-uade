@@ -14,6 +14,8 @@ interface User {
   password: string;
   code: string;
   name: string;
+  firstName?: string;
+  lastName?: string;
   avatar: string;
   pizzaImage: string;
   recipes: Recipe[];
@@ -114,6 +116,7 @@ interface AuthState {
   isPassRecovery: boolean;
   searchUsers: SearchUser[];
   login: (userData: User) => void;
+  register: (userData: User) => void;
   passRecovery: (email: string) => void;
   updatePassword: (newPassword: string) => void;
   logout: () => void;
@@ -127,6 +130,11 @@ const useAuthStore = create<AuthState>()((set) => ({
   isLoading: false,
   isPassRecovery: false,
   login: (userData: User) =>
+    set({
+      user: userData,
+      isAuthenticated: true,
+    }),
+  register: (userData: User) =>
     set({
       user: userData,
       isAuthenticated: true,
