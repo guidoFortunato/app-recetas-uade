@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "https://api-recetas.onrender.com/usuarios"; // Cambiá por tu dominio real
+const API = "http://localhost:8080/usuarios"; // Cambiá por tu dominio real
 
 export interface LoginRequestDTO {
   aliasOEmail: string;
