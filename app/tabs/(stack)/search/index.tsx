@@ -72,8 +72,7 @@ const ProfileSearchScreen = () => {
                   className="mr-2"
                 >
                   <RecipeCard
-                    icon="open-outline"
-                    iconFill="open"
+                    
                     {...recipe}
                   />
                 </Link>
