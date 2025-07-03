@@ -91,7 +91,7 @@ const UserProfileScreen = () => {
               <View className="flex-row items-center justify-center">
                 <Image
                   source={{
-                    uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
+                    uri: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.shutterstock.com%2Fimage-vector%2Fblank-avatar-photo-place-holder-600nw-1095249842.jpg&f=1&nofb=1&ipt=79d599038d68a755320966179323004cfa8cabd1f70a75f4a3f0fec74e64f478",
                   }}
                   className="w-20 h-20 rounded-full"
                   onError={() => setAvatarError(true)}
@@ -117,7 +117,7 @@ const UserProfileScreen = () => {
         <View className="px-4 mb-6 mt-2">
           <View className="flex-row items-center justify-between">
             <Text className="text-2xl font-bold text-gray-800">
-              {user.nombre}
+              {user.alias}
             </Text>
             <View className="flex-row items-center">
               <Ionicons name="star" size={18} color="#FFD700" />

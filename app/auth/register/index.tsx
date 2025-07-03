@@ -7,112 +7,119 @@ import {
   View,
 } from "react-native";
 
-import useAuthStore from "@/store/authStore";
 import { isValidEmail } from "@/utils/emailValidator";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
+import {
+  completarRegistro,
+  registrarUsuarioInicial,
+} from "@/utils/api/usuarios";
+
 const RegisterScreen = () => {
-  const { register, user } = useAuthStore();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [alias, setAlias] = useState("");
   const [email, setEmail] = useState("");
   const [confirmEmail, setConfirmEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [idUsuario, setIdUsuario] = useState<number | null>(null);
 
-  const handleNext = () => {
-    if (step === 0) {
-      if (!firstName.trim()) {
-        alert("Ingrese su nombre para continuar");
-        return;
-      }
-      if (!lastName.trim()) {
-        alert("Ingrese su apellido para continuar");
-        return;
-      }
-      setStep(1);
-      return;
-    }
-
-    if (step === 1) {
-      if (!email.trim()) {
-        alert("Ingrese su correo electrónico para continuar");
-        return;
-      }
-      if (!isValidEmail(email)) {
-        alert("Ingrese un correo electrónico válido");
-        return;
-      }
-      setStep(2);
-      return;
-    }
-
-    if (step === 2) {
-      if (!confirmEmail.trim()) {
-        alert("Confirme su correo electrónico para continuar");
-        return;
-      }
-      if (email !== confirmEmail) {
-        alert("Los correos electrónicos no coinciden");
-        return;
-      }
-      setStep(3);
-      return;
-    }
-
-    if (step === 3) {
-      if (!password.trim()) {
-        alert("Ingrese su contraseña para continuar");
-        return;
-      }
-      if (password.length < 6) {
-        alert("La contraseña debe tener al menos 6 caracteres");
-        return;
-      }
-      setStep(4);
-      return;
-    }
-
-    if (step === 4) {
-      if (!confirmPassword.trim()) {
-        alert("Confirme su contraseña para continuar");
-        return;
-      }
-      if (password !== confirmPassword) {
-        alert("Las contraseñas no coinciden");
+  const handleNext = async () => {
+    try {
+      if (step === 0) {
+        if (!firstName.trim()) {
+          alert("Ingrese su nombre");
+          return;
+        }
+        if (!lastName.trim()) {
+          alert("Ingrese su apellido");
+          return;
+        }
+        setStep(1);
         return;
       }
 
-      // Registrar usuario
-      const newUser = {
-        ...user,
-        firstName,
-        lastName,
-        email,
-        password,
-      };
-      
-      register(newUser);
-      router.replace("/tabs/(stack)/home");
-    }
-  };
+      if (step === 1) {
+        if (!alias.trim()) {
+          alert("Ingrese un alias");
+          return;
+        }
+        if (alias.includes(" ")) {
+          alert("El alias no puede contener espacios");
+          return;
+        }
+        if (!email.trim() || !confirmEmail.trim()) {
+          alert("Complete ambos campos de correo");
+          return;
+        }
+        if (!isValidEmail(email)) {
+          alert("Correo electrónico no válido");
+          return;
+        }
+        if (email !== confirmEmail) {
+          alert("Los correos no coinciden");
+          return;
+        }
 
-  const getStepTitle = () => {
-    switch (step) {
-      case 0:
-        return "Nombre y Apellido";
-      case 1:
-        return "Correo Electrónico";
-      case 2:
-        return "Confirmar Correo";
-      case 3:
-        return "Contraseña";
-      case 4:
-        return "Confirmar Contraseña";
-      default:
-        return "Registro";
+        setLoading(true);
+        const dto = { alias, email };
+        const usuario = await registrarUsuarioInicial(dto);
+        setIdUsuario(usuario.idUsuario);
+        alert("Registro inicial exitoso. Ahora completa tu información.");
+        setStep(2);
+        return;
+      }
+
+      if (step === 2) {
+        if (!password.trim()) {
+          alert("Ingrese una contraseña");
+          return;
+        }
+        if (password.length < 6) {
+          alert("La contraseña debe tener al menos 6 caracteres");
+          return;
+        }
+        setStep(3);
+        return;
+      }
+
+      if (step === 3) {
+        if (!confirmPassword.trim()) {
+          alert("Confirme su contraseña");
+          return;
+        }
+        if (password !== confirmPassword) {
+          alert("Las contraseñas no coinciden");
+          return;
+        }
+
+        if (!idUsuario) {
+          alert("Error interno: ID de usuario no encontrado");
+          return;
+        }
+
+        setLoading(true);
+        const dto = {
+          nombre: firstName,
+          apellido: lastName,
+          contrasena: password,
+        };
+        await completarRegistro(idUsuario, dto);
+        alert("Cuenta creada correctamente");
+        router.replace("/auth/login");
+      }
+    } catch (error: any) {
+      if (error.response?.status === 409 && error.response.data) {
+        alert(error.response.data); // "El alias ya está en uso" o "El email ya está en uso"
+      } else {
+        alert("Ocurrió un error durante el registro");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -121,12 +128,10 @@ const RegisterScreen = () => {
       case 0:
         return "Ingresa tu nombre y apellido";
       case 1:
-        return "Ingresa tu correo electrónico";
+        return "Alias y correo electrónico";
       case 2:
-        return "Confirma tu correo electrónico";
-      case 3:
         return "Crea una contraseña segura";
-      case 4:
+      case 3:
         return "Confirma tu contraseña";
       default:
         return "";
@@ -141,7 +146,6 @@ const RegisterScreen = () => {
             <TextInput
               className="w-full border border-neutral-200 rounded-lg p-3 mb-3 text-base bg-neutral-50"
               placeholder="Nombre"
-              placeholderTextColor="#aaa"
               value={firstName}
               onChangeText={setFirstName}
               autoCapitalize="words"
@@ -149,7 +153,6 @@ const RegisterScreen = () => {
             <TextInput
               className="w-full border border-neutral-200 rounded-lg p-3 mb-4 text-base bg-neutral-50"
               placeholder="Apellido"
-              placeholderTextColor="#aaa"
               value={lastName}
               onChangeText={setLastName}
               autoCapitalize="words"
@@ -158,48 +161,50 @@ const RegisterScreen = () => {
         );
       case 1:
         return (
-          <TextInput
-            className="w-full border border-neutral-200 rounded-lg p-3 mb-4 text-base bg-neutral-50"
-            placeholder="mail@dominio.com"
-            placeholderTextColor="#aaa"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
+          <>
+            <TextInput
+              className="w-full border border-neutral-200 rounded-lg p-3 mb-3 text-base bg-neutral-50"
+              placeholder="Alias"
+              value={alias}
+              onChangeText={setAlias}
+              autoCapitalize="none"
+            />
+            <TextInput
+              className="w-full border border-neutral-200 rounded-lg p-3 mb-3 text-base bg-neutral-50"
+              placeholder="Correo electrónico"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <TextInput
+              className="w-full border border-neutral-200 rounded-lg p-3 mb-4 text-base bg-neutral-50"
+              placeholder="Confirmar correo electrónico"
+              value={confirmEmail}
+              onChangeText={setConfirmEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </>
         );
       case 2:
         return (
           <TextInput
             className="w-full border border-neutral-200 rounded-lg p-3 mb-4 text-base bg-neutral-50"
-            placeholder="mail@dominio.com"
-            placeholderTextColor="#aaa"
-            value={confirmEmail}
-            onChangeText={setConfirmEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
+            placeholder="Contraseña"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
           />
         );
       case 3:
         return (
           <TextInput
             className="w-full border border-neutral-200 rounded-lg p-3 mb-4 text-base bg-neutral-50"
-            placeholder="Mínimo 6 caracteres"
-            placeholderTextColor="#aaa"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={true}
-          />
-        );
-      case 4:
-        return (
-          <TextInput
-            className="w-full border border-neutral-200 rounded-lg p-3 mb-4 text-base bg-neutral-50"
-            placeholder="Repite tu contraseña"
-            placeholderTextColor="#aaa"
+            placeholder="Confirmar contraseña"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            secureTextEntry={true}
+            secureTextEntry
           />
         );
       default:
@@ -215,7 +220,7 @@ const RegisterScreen = () => {
             name="arrow-back-outline"
             size={24}
             color="#374151"
-            onPress={() => setStep(step - 1)}
+            onPress={() => setStep((prev) => prev - 1)}
           />
         </View>
       )}
@@ -233,16 +238,19 @@ const RegisterScreen = () => {
           className="w-full bg-primary py-3 rounded-lg items-center"
           activeOpacity={0.8}
           onPress={handleNext}
+          disabled={loading}
         >
           <Text className="text-white text-base font-bold">
-            {step === 4 ? "Crear cuenta" : "Continuar"}
+            {loading
+              ? "Cargando..."
+              : step === 3
+              ? "Crear cuenta"
+              : "Continuar"}
           </Text>
         </TouchableOpacity>
 
         <View className="flex flex-row justify-center mt-4">
-          <Text className="text-sm text-neutral-500">
-            ¿Ya tienes cuenta?{" "}
-          </Text>
+          <Text className="text-sm text-neutral-500">¿Ya tienes cuenta? </Text>
           <Text
             className="text-sm text-primary underline font-semibold"
             onPress={() => router.push("/auth/login")}
