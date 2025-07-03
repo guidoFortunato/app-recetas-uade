@@ -1,5 +1,6 @@
 import { SearchBar } from "@/components/searchBar";
-import { CategoriaReceta, obtenerCategorias } from "@/utils/api/categoriaRecetas"; // asumí que pusiste ahí la lógica del backend
+import { CategoriaReceta, obtenerCategorias } from "@/utils/api/categoriaRecetas";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -12,16 +13,16 @@ import {
 } from "react-native";
 
 const FoodCategoriesScreen = () => {
+  const router = useRouter();
   const [categories, setCategories] = useState<{ name: string, image: string }[]>([]);
 
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
         const data: CategoriaReceta[] = await obtenerCategorias();
-        // Mapeá cada categoría del backend a tu estructura del front
         const formatted = data.map(cat => ({
-          name: cat.nombre.replace(/_/g, " "), // ejemplo: "PESCADOS_Y_MARISCOS" → "PESCADOS Y MARISCOS"
-          image: "https://via.placeholder.com/100", // reemplazá con imagen real si la tenés
+          name: cat.nombre.replace(/_/g, " "),
+          image: "https://i.imgur.com/SmMtt1x.png",
         }));
         setCategories(formatted);
       } catch (error) {
@@ -31,7 +32,6 @@ const FoodCategoriesScreen = () => {
     fetchCategorias();
   }, []);
 
-  // La función para agrupar en filas de 3
   const chunkArray = (array: any[], size: number) => {
     const chunks = [];
     for (let i = 0; i < array.length; i += size) {
@@ -43,7 +43,15 @@ const FoodCategoriesScreen = () => {
   const categoryRows = chunkArray(categories, 3);
 
   const CategoryItem = ({ item }: { item: { name: string, image: string } }) => (
-    <TouchableOpacity className="items-center flex-1 mx-2" activeOpacity={0.7}>
+    <TouchableOpacity
+      className="items-center flex-1 mx-2"
+      activeOpacity={0.7}
+      onPress={() => {
+        // Navegar pasando el nombre de la categoría en formato del backend
+        const categoryParam = item.name.toUpperCase().replace(/ /g, "_");
+        router.push(`/tabs/(stack)/categories/busquedacategoria?categoryName=${encodeURIComponent(categoryParam)}`);
+      }}
+    >
       <View className="mb-2 items-center justify-center">
         <Image
           source={{ uri: item.image }}
@@ -80,3 +88,4 @@ const FoodCategoriesScreen = () => {
 };
 
 export default FoodCategoriesScreen;
+

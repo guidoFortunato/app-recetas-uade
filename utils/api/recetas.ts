@@ -200,10 +200,10 @@ export enum TipoMultimedia {
     return data
   }
   
-  export async function obtenerRecetasPorCategoria(categoria: CategoriaReceta): Promise<RecetaRespuestaDTO[]> {
-    const res = await fetch(`${API_URL}/categoria/${categoria}`)
-    if (!res.ok) throw new Error("Error al obtener recetas por categoría")
-    return res.json()
+  export async function obtenerRecetasPorCategoria(categoria: string | CategoriaReceta): Promise<RecetaRespuestaDTO[]> {
+    const res = await fetch(`${API_URL}/categoria/${categoria}`);
+    if (!res.ok) throw new Error("Error al obtener recetas por categoría");
+    return res.json();
   }
   
   export async function obtenerPorEstadoYVisibilidad(estado: EstadoReceta, publico: boolean): Promise<RecetaRespuestaDTO[]> {

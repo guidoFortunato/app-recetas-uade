@@ -1,8 +1,7 @@
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { SearchBar } from "@/components/searchBar";
-import useProductsStore from "@/store/productsStore";
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -14,16 +13,21 @@ import {
   View
 } from "react-native";
 
+import { CategoriaReceta as CategoriaRecetaDTO, obtenerCategorias } from "@/utils/api/categoriaRecetas";
 import { EstadoReceta, obtenerPorEstadoYVisibilidad, RecetaRespuestaDTO } from "@/utils/api/recetas";
 
 const HomeScreen = () => {
-  const { productCategories } = useProductsStore();
+  const router = useRouter(); // inicializá el router para navegación programática
 
-  // Estado local para recetas sugeridas cargadas desde API
+  // Estado para recetas sugeridas
   const [recetasSugeridas, setRecetasSugeridas] = useState<RecetaRespuestaDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Estado para categorías
+  const [categories, setCategories] = useState<{ name: string, image: string }[]>([]);
+
+  // Cargar recetas sugeridas
   useEffect(() => {
     const cargarRecetasSugeridas = async () => {
       try {
@@ -40,13 +44,34 @@ const HomeScreen = () => {
     cargarRecetasSugeridas();
   }, []);
 
+  // Cargar categorías reales del backend
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const data: CategoriaRecetaDTO[] = await obtenerCategorias();
+        const formatted = data.map(cat => {
+          const imagenReal: string = ""; // reemplazá con cat.imagen cuando esté disponible
+          return {
+            name: cat.nombre.replace(/_/g, " "),
+            image: imagenReal && imagenReal.trim() !== ""
+              ? imagenReal
+              : "https://i.imgur.com/SmMtt1x.png",
+          };
+        });  
+        setCategories(formatted);
+      } catch (error) {
+        console.error("Error cargando categorías en Home:", error);
+      }
+    };
+    fetchCategorias();
+  }, []);
+
   return (
     <SafeAreaView className="flex-1 bg-white mt-10">
       <StatusBar barStyle="dark-content" backgroundColor="white" />
 
       {/* Header */}
       <View className="px-4 pt-2">
-        {/* Search Bar */}
         <SearchBar />
 
         {/* Navigation Tabs */}
@@ -109,8 +134,16 @@ const HomeScreen = () => {
             className="px-4"
             contentContainerStyle={{ paddingRight: 16 }}
           >
-            {productCategories.map((category) => (
-              <TouchableOpacity key={category.id} className="items-center mr-6">
+            {categories.map((category) => (
+              <TouchableOpacity
+                key={category.name}
+                className="items-center mr-6"
+                onPress={() => {
+                  // Convertí la categoría al formato esperado por el backend (mayúsculas y guiones bajos)
+                  const categoryParam = category.name.toUpperCase().replace(/ /g, "_");
+                  router.push(`/tabs/(stack)/categories/busquedacategoria?categoryName=${encodeURIComponent(categoryParam)}`);
+                }}
+              >
                 <Image
                   source={{ uri: category.image }}
                   className="w-16 h-16 rounded-full mb-2"
@@ -165,3 +198,4 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
+
