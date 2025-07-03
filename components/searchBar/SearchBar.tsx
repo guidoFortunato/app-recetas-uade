@@ -1,3 +1,5 @@
+import useProductsStore from "@/store/productsStore";
+import { obtenerRecetasPorTitulo } from "@/utils/api/recetas";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -5,16 +7,20 @@ import { TextInput, View } from "react-native";
 
 export const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { handleSearchRecipes } = useProductsStore();
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
   };
   
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (searchQuery.trim() === "") {
       alert("Por favor, ingrese un texto")
       return 
     }
+
+    const recetas = await obtenerRecetasPorTitulo(searchQuery);
+    handleSearchRecipes(recetas);
 
     router.push(`/tabs/search?query=${searchQuery}`);
     setSearchQuery("");

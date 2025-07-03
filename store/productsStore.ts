@@ -1,3 +1,4 @@
+import { RecetaRespuestaDTO } from "@/utils/api/recetas";
 import { create } from "zustand";
 
 interface ProductCategory {
@@ -16,8 +17,10 @@ interface Recipe {
 interface ProductsState {
   productCategories: ProductCategory[];
   recipes: Recipe[];
+  searchRecipes: RecetaRespuestaDTO[];
   searchQuery: string;
   handleSearchQuery: (query: string) => void;
+  handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => void;
 }
 
 const useProductsStore = create<ProductsState>((set) => ({
@@ -120,6 +123,7 @@ const useProductsStore = create<ProductsState>((set) => ({
         "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=100&h=100&fit=crop&crop=center",
     },
   ],
+  searchRecipes: [],
   recipes: [
     {
       id: 1,
@@ -178,6 +182,7 @@ const useProductsStore = create<ProductsState>((set) => ({
   ],
 
   handleSearchQuery: (query: string) => set({ searchQuery: query }),
+  handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => set({ searchRecipes: recipes }),
 }));
 
 export default useProductsStore;

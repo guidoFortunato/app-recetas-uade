@@ -1,7 +1,7 @@
 
-const API_URL  = "http://10.0.2.2:8080/recetas";
-
 import { CategoriaReceta } from "@/utils/api/categoriaRecetas";
+
+const API_URL  = "http://10.0.2.2:8080/recetas";
 
 //const categorias: CategoriaReceta[] = await obtenerCategorias()
 // cada categoría es: { nombre: string }
@@ -196,7 +196,8 @@ export enum TipoMultimedia {
   export async function obtenerRecetasPorTitulo(titulo: string): Promise<RecetaRespuestaDTO[]> {
     const res = await fetch(`${API_URL}/buscar?titulo=${encodeURIComponent(titulo)}`)
     if (!res.ok) throw new Error("Error al buscar recetas por título")
-    return res.json()
+    const data = await res.json()
+    return data
   }
   
   export async function obtenerRecetasPorCategoria(categoria: CategoriaReceta): Promise<RecetaRespuestaDTO[]> {

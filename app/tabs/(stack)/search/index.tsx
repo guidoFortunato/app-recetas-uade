@@ -1,25 +1,26 @@
+import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { SearchBar } from "@/components/searchBar";
-import { UserCard } from "@/components/users/UserCard";
-import useAuthStore from "@/store/authStore";
+// import useAuthStore from "@/store/authStore";
+import useProductsStore from "@/store/productsStore";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
+import { Link } from "expo-router";
 import {
   SafeAreaView,
-  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 const ProfileSearchScreen = () => {
-  const { query } = useLocalSearchParams();
+  // const { query } = useLocalSearchParams();
 
-  const { searchUsers } = useAuthStore();
+  // const { searchUsers } = useAuthStore();
+  const { searchRecipes } = useProductsStore();
 
-  const filteredUsers = searchUsers.filter((user) =>
-    user.name.toLowerCase().includes(query.toString().toLowerCase())
-  );
+  // const filteredUsers = searchUsers.filter((user) =>
+  //   user.name.toLowerCase().includes(query.toString().toLowerCase())
+  // );
 
   return (
     <View className="flex-1 bg-white">
@@ -31,7 +32,7 @@ const ProfileSearchScreen = () => {
           <SearchBar />
 
           {/* titulo */}
-          <Text className="text-xl font-bold text-gray-800 mb-4">Usuarios</Text>
+          <Text className="text-xl font-bold text-gray-800 mb-4">Recetas</Text>
 
           {/* Filtrar y ordenar */}
           <View className="flex-row items-center justify-between mb-4">
@@ -47,16 +48,39 @@ const ProfileSearchScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <Text className="text-sm text-gray-500">
+            {/* <Text className="text-sm text-gray-500">
               {filteredUsers.length}{" "}
               {filteredUsers.length === 1 ? "resultado" : "resultados"}
-            </Text>
+            </Text> */}
           </View>
         </View>
 
-        {/* Lista de usuarios */}
+        {/* Lista de recetas */}
+        <View className="flex-row flex-wrap justify-between mb-24">
+            {/* {loadingRecetas && <Text>Cargando recetas...</Text>} */}
+            {/* {errorRecetas && (
+              <Text className="text-red-600">{errorRecetas}</Text>
+            )} */}
+              {/* {!loadingRecetas && !errorRecetas && recetas.length === 0 && (
+                <Text>No tienes recetas todavía.</Text>
+              )} */}
+              {
+              searchRecipes.map((recipe) => (
+                <Link
+                  href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
+                  key={recipe.idReceta}
+                  className="mr-2"
+                >
+                  <RecipeCard
+                    icon="open-outline"
+                    iconFill="open"
+                    {...recipe}
+                  />
+                </Link>
+            ))}
+          </View>
 
-        {filteredUsers.length > 0 ? (
+        {/* {filteredUsers.length > 0 ? (
           <View className="flex-1">
             <ScrollView
               className="flex-1 px-4"
@@ -72,7 +96,7 @@ const ProfileSearchScreen = () => {
           <View className="flex-1 items-center justify-center">
             <Text className="text-gray-500">No se encontraron resultados</Text>
           </View>
-        )}
+        )} */}
       </SafeAreaView>
     </View>
   );
