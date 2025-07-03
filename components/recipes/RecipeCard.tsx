@@ -38,7 +38,7 @@ export const RecipeCard = ({
 
   const imageUrl =
     multimedia?.find((m) => m.tipo === "imagen")?.url ??
-    "https://via.placeholder.com/150"; // fallback por si no hay imagen
+    "https://i.imgur.com/SmMtt1x.png"; // fallback por si no hay imagen
 
   const handleBookmark = () => {
     if (isBookmarked) {
