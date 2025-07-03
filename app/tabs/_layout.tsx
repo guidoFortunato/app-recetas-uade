@@ -1,7 +1,34 @@
+import useAuthStore from "@/store/authStore";
+import useProductsStore from "@/store/productsStore";
+import { obtenerRecetasIntentarPorUsuario } from "@/utils/api/recetas";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { useEffect } from "react";
 
 const TabsLayout = () => {
+  const { user } = useAuthStore();
+  const { handleFavoritesRecipes } = useProductsStore();
+
+  useEffect(() => {
+    if (!user?.idUsuario) return;
+    const cargarRecetas = async () => {
+      try {
+        const recetasUsuario = await obtenerRecetasIntentarPorUsuario(
+          user.idUsuario
+        );
+        console.log(
+          "recetasUsuario",
+          recetasUsuario.map((receta) => receta.titulo)
+        );
+        handleFavoritesRecipes(recetasUsuario);
+      } catch (error) {
+        console.log("error", error);
+        throw error;
+      }
+    };
+    cargarRecetas();
+  }, [user?.idUsuario, handleFavoritesRecipes]);
+
   return (
     <Tabs
       screenOptions={{
@@ -29,7 +56,7 @@ const TabsLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="create/index"        
+        name="create/index"
         options={{
           title: "Crear receta",
           tabBarIcon: ({ color }) => (

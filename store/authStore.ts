@@ -1,13 +1,13 @@
 import { LoginResponseDTO } from "@/utils/api/usuarios";
 import { create } from "zustand";
 
-interface Recipe {
-  id: number;
-  name: string;
-  rating: number;
-  image: string;
-  hasExternalLink: boolean;
-}
+// interface Recipe {
+//   id: number;
+//   name: string;
+//   rating: number;
+//   image: string;
+//   hasExternalLink: boolean;
+// }
 /* 
 interface User {
   idUsuario: LoginResponseDTO["idUsuario"];
