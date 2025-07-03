@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 import useProductsStore from "@/store/productsStore";
-import { obtenerRecetaPorId, RecetaRespuestaDTO } from "@/utils/api/recetas";
-=======
 import { obtenerRecetaPorId, obtenerValoracionesAprobadasPorReceta, RecetaRespuestaDTO, ValoracionRecetaDTO } from "@/utils/api/recetas";
->>>>>>> ba213227f3b09db06895020a7270cc86d509389a
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -28,19 +24,15 @@ const RecipeDetailScreen = () => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-<<<<<<< HEAD
   // Store para favoritos
   const { removeFromFavorites, addToFavorites, favoritesRecipes } = useProductsStore();
 
   // Estados para reseñas (se mantienen igual)
-=======
->>>>>>> ba213227f3b09db06895020a7270cc86d509389a
   const [reviewTitle, setReviewTitle] = useState("");
   const [reviewDescription, setReviewDescription] = useState("");
   const [userRating, setUserRating] = useState(0);
   const [valoraciones, setValoraciones] = useState<ValoracionRecetaDTO[]>([]);
 
-<<<<<<< HEAD
   // Sincronizar el estado local con el estado global de favoritos
   useEffect(() => {
     if (recipe) {
@@ -50,8 +42,6 @@ const RecipeDetailScreen = () => {
   }, [favoritesRecipes, recipe]);
 
   // Carga la receta desde la API según el id
-=======
->>>>>>> ba213227f3b09db06895020a7270cc86d509389a
   useEffect(() => {
     if (!id) return;
 
@@ -63,6 +53,7 @@ const RecipeDetailScreen = () => {
         setError(null);
         setImageError(false);
       } catch (e) {
+        console.error("Error al cargar la receta", e);
         setError("No se pudo cargar la receta");
         setRecipe(null);
       } finally {
