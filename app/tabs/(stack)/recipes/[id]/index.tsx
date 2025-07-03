@@ -1,4 +1,4 @@
-import { obtenerRecetaPorId, RecetaRespuestaDTO } from "@/utils/api/recetas";
+import { obtenerRecetaPorId, obtenerValoracionesAprobadasPorReceta, RecetaRespuestaDTO, ValoracionRecetaDTO } from "@/utils/api/recetas";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -17,45 +17,17 @@ const RecipeDetailScreen = () => {
   const { id } = useLocalSearchParams();
   const navigation = useNavigation();
 
-  // Estados para la receta, loading y error
   const [recipe, setRecipe] = useState<RecetaRespuestaDTO | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Estados para bookmark e imagen error
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  // Estados para reseñas (se mantienen igual)
   const [reviewTitle, setReviewTitle] = useState("");
   const [reviewDescription, setReviewDescription] = useState("");
   const [userRating, setUserRating] = useState(0);
-  const [reviews, setReviews] = useState([
-    {
-      id: 1,
-      title: "Mejor Pizza del mundo",
-      rating: 5,
-      description:
-        "Esta receta de pizza Margarita es fácil y deliciosa. La masa crujiente, la salsa de tomate bien sazonada y la mozzarella cremosa crean un sabor clásico que siempre encanta.",
-      author: "Miranda Di Felice",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face",
-      timeAgo: "2 días",
-    },
-    {
-      id: 2,
-      title: "Esperaba Más",
-      rating: 2,
-      description:
-        "La receta de pizza Margarita tiene buena base, pero la masa quedó algo seca y la salsa le faltó sabor. Tal vez necesite más condimentos.",
-      author: "Agustín Pérez",
-      avatar:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-      timeAgo: "3 días",
-    },
-  ]);
+  const [valoraciones, setValoraciones] = useState<ValoracionRecetaDTO[]>([]);
 
-  // Carga la receta desde la API según el id
   useEffect(() => {
     if (!id) return;
 
@@ -65,7 +37,7 @@ const RecipeDetailScreen = () => {
         const receta = await obtenerRecetaPorId(Number(id));
         setRecipe(receta);
         setError(null);
-        setImageError(false); // reset imagen error
+        setImageError(false);
       } catch (e) {
         setError("No se pudo cargar la receta");
         setRecipe(null);
@@ -77,7 +49,19 @@ const RecipeDetailScreen = () => {
     cargarReceta();
   }, [id]);
 
-  // Actualizar título de la pantalla
+  useEffect(() => {
+    if (!id) return;
+    const loadVals = async () => {
+      try {
+        const vals = await obtenerValoracionesAprobadasPorReceta(Number(id));
+        setValoraciones(vals);
+      } catch (e) {
+        console.error("Error al cargar valoraciones", e);
+      }
+    };
+    loadVals();
+  }, [id]);
+
   useEffect(() => {
     navigation.setOptions({
       title: recipe?.titulo ?? "Detalle de receta",
@@ -108,10 +92,15 @@ const RecipeDetailScreen = () => {
     );
   }
 
-  // Buscar URL imagen principal
   const imagenReceta = recipe.multimedia.find((m) => m.tipo === "imagen")?.url;
 
-  // Función para renderizar estrellas (igual que antes)
+  const calcularTiempo = (fechaISO: string) => {
+    const diffDias = Math.floor((Date.now() - new Date(fechaISO).getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDias === 0) return "Hoy";
+    if (diffDias === 1) return "Ayer";
+    return `Hace ${diffDias} días`;
+  };
+
   const renderStars = (
     rating: number,
     size: number = 16,
@@ -138,7 +127,6 @@ const RecipeDetailScreen = () => {
     );
   };
 
-  // Componente para mostrar cada reseña (igual que antes)
   const ReviewCard = ({ review }: { review: any }) => {
     const [avatarError, setAvatarError] = useState(false);
 
@@ -152,7 +140,7 @@ const RecipeDetailScreen = () => {
           {review.description}
         </Text>
         <View className="flex-row items-center">
-          {!avatarError ? (
+          {!avatarError && review.avatar ? (
             <Image
               source={{ uri: review.avatar }}
               className="w-8 h-8 rounded-full mr-2"
@@ -174,26 +162,13 @@ const RecipeDetailScreen = () => {
     );
   };
 
-  // Maneja envío de reseña (igual)
   const handleSubmitReview = () => {
     if (!reviewTitle || !reviewDescription || userRating === 0) {
       alert("Por favor completa todos los campos");
       return;
     }
 
-    const newReview = {
-      id: reviews.length + 1,
-      title: reviewTitle,
-      rating: userRating,
-      description: reviewDescription,
-      author: "Tu nombre",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face",
-      timeAgo: "Ahora",
-    };
-
-    setReviews([...reviews, newReview]);
-    alert("Reseña enviada");
+    alert("Reseña enviada (mock)");
     setReviewTitle("");
     setReviewDescription("");
     setUserRating(0);
@@ -210,7 +185,6 @@ const RecipeDetailScreen = () => {
           bounces={true}
           contentContainerStyle={{ flexGrow: 1 }}
         >
-          {/* Recipe Image */}
           <View className="relative">
             {!imageError && imagenReceta ? (
               <Image
@@ -226,7 +200,6 @@ const RecipeDetailScreen = () => {
             )}
           </View>
 
-          {/* Recipe Info */}
           <View className="px-4 py-4">
             <View className="flex-row items-center justify-between mb-2">
               <Text className="text-xs text-gray-500">{recipe.usuario.alias}</Text>
@@ -249,8 +222,7 @@ const RecipeDetailScreen = () => {
             <View className="flex-row items-center mb-4">
               <Ionicons name="star" size={16} color="#FFD700" />
               <Text className="text-sm font-medium text-gray-700 ml-1">
-                {/* acá podés calcular rating promedio real */}
-                8.5
+                5
               </Text>
             </View>
 
@@ -259,7 +231,6 @@ const RecipeDetailScreen = () => {
             </Text>
           </View>
 
-          {/* Ingredients */}
           <View className="px-4 mb-6">
             <Text className="text-lg font-bold text-gray-800 mb-3">
               Ingredientes:
@@ -268,14 +239,12 @@ const RecipeDetailScreen = () => {
               <View key={index} className="flex-row items-start mb-2">
                 <Text className="text-gray-600 mr-2">•</Text>
                 <Text className="text-sm text-gray-600 flex-1">
-                  {ingrediente.cantidad} {ingrediente.unidadMedida} de{" "}
-                  {ingrediente.nombre}
+                  {ingrediente.cantidad} {ingrediente.unidadMedida} de {ingrediente.nombre}
                 </Text>
               </View>
             ))}
           </View>
 
-          {/* Preparation Steps */}
           <View className="px-4 mb-6">
             <Text className="text-lg font-bold text-gray-800 mb-4">
               Preparación
@@ -292,21 +261,33 @@ const RecipeDetailScreen = () => {
             ))}
           </View>
 
-          {/* Reviews Section */}
           <View className="px-4 mb-6">
             <Text className="text-lg font-bold text-gray-800 mb-4">Reseñas</Text>
-            {reviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
-            ))}
+            {valoraciones.length ? (
+              valoraciones.map((v, i) => (
+                <ReviewCard
+                  key={i}
+                  review={{
+                    id: i,
+                    title: "",
+                    rating: v.puntaje,
+                    description: v.comentario,
+                    author: v.usuario.alias,
+                    avatar: undefined,
+                    timeAgo: calcularTiempo(v.fechaValoracion),
+                  }}
+                />
+              ))
+            ) : (
+              <Text className="text-gray-600">No hay reseñas todavía.</Text>
+            )}
           </View>
 
-          {/* Add Review Form */}
           <View className="px-4 mb-32">
             <Text className="text-lg font-bold text-gray-800 mb-4">
               Agregar Reseña
             </Text>
 
-            {/* Title Input */}
             <View className="mb-4">
               <Text className="text-gray-800 font-medium mb-2">Título</Text>
               <TextInput
@@ -318,7 +299,6 @@ const RecipeDetailScreen = () => {
               />
             </View>
 
-            {/* Description Input */}
             <View className="mb-4">
               <Text className="text-gray-800 font-medium mb-2">Descripción</Text>
               <TextInput
@@ -333,13 +313,11 @@ const RecipeDetailScreen = () => {
               />
             </View>
 
-            {/* Rating */}
             <View className="mb-4">
               <Text className="text-gray-800 font-medium mb-2">Calificación</Text>
               {renderStars(userRating, 24, setUserRating)}
             </View>
 
-            {/* Submit Button */}
             <TouchableOpacity
               onPress={handleSubmitReview}
               className="bg-black rounded-lg py-3 items-center"
