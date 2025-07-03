@@ -1,3 +1,4 @@
+import { LoginResponseDTO } from "@/utils/api/usuarios";
 import { create } from "zustand";
 
 interface Recipe {
@@ -7,19 +8,15 @@ interface Recipe {
   image: string;
   hasExternalLink: boolean;
 }
-
+/* 
 interface User {
-  id: number;
-  email: string;
-  password: string;
-  code: string;
-  name: string;
-  firstName?: string;
-  lastName?: string;
-  avatar: string;
-  pizzaImage: string;
-  recipes: Recipe[];
+  idUsuario: LoginResponseDTO["idUsuario"];
+  email: LoginResponseDTO["email"];
+  contrasena: LoginResponseDTO["contrasena"];
+  nombre?: LoginResponseDTO["nombre"];
+  apellido?: LoginResponseDTO["apellido"];
 }
+*/
 
 interface SearchUser {
   id: number;
@@ -29,11 +26,12 @@ interface SearchUser {
   featuredImage: string;
   avatarBg: string;
 }
+
 // Datos de prueba
 const user: User = {
-  id: 1,
+  idUsuario: 1,
   email: "test@test.com",
-  password: "123456",
+  contrasena: "123456",
   code: "5",
   name: "Nicolas Alvarez",
   avatar:
@@ -106,17 +104,16 @@ const searchUsers: SearchUser[] = [
       "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=80&h=80&fit=crop&crop=center",
     avatarBg: "#DBEAFE",
   },
-  
 ];
 
 interface AuthState {
-  user: User;
+  user: LoginResponseDTO;
   isAuthenticated: boolean;
   isLoading: boolean;
   isPassRecovery: boolean;
   searchUsers: SearchUser[];
-  login: (userData: User) => void;
-  register: (userData: User) => void;
+  login: (userData: LoginResponseDTO) => void;
+  register: (userData: LoginResponseDTO) => void;
   passRecovery: (email: string) => void;
   updatePassword: (newPassword: string) => void;
   logout: () => void;
@@ -129,12 +126,12 @@ const useAuthStore = create<AuthState>()((set) => ({
   isAuthenticated: false,
   isLoading: false,
   isPassRecovery: false,
-  login: (userData: User) =>
+  login: (userData: LoginResponseDTO) =>
     set({
       user: userData,
       isAuthenticated: true,
     }),
-  register: (userData: User) =>
+  register: (userData: LoginResponseDTO) =>
     set({
       user: userData,
       isAuthenticated: true,

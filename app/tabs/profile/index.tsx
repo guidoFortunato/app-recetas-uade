@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -11,13 +11,41 @@ import {
   View,
 } from "react-native";
 
+import { Link } from "expo-router";
+
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import useAuthStore from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
 
+import { obtenerRecetasPorUsuario, RecetaRespuestaDTO } from "@/utils/api/recetas";
+
 const UserProfileScreen = () => {
   const { user, logout } = useAuthStore();
   const [avatarError, setAvatarError] = useState(false);
+
+  // Estado para recetas
+  const [recetas, setRecetas] = useState<RecetaRespuestaDTO[]>([]);
+  const [loadingRecetas, setLoadingRecetas] = useState(false);
+  const [errorRecetas, setErrorRecetas] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user?.idUsuario) return;
+
+    const cargarRecetas = async () => {
+      try {
+        setLoadingRecetas(true);
+        const recetasUsuario = await obtenerRecetasPorUsuario(user.idUsuario);
+        setRecetas(recetasUsuario);
+        setErrorRecetas(null);
+      } catch (error) {
+        setErrorRecetas((error as Error).message || "Error cargando recetas");
+      } finally {
+        setLoadingRecetas(false);
+      }
+    };
+
+    cargarRecetas();
+  }, [user?.idUsuario]);
 
   const handleLogoutPress = () => {
     Alert.alert(
@@ -88,7 +116,7 @@ const UserProfileScreen = () => {
         <View className="px-4 mb-6 mt-2">
           <View className="flex-row items-center justify-between">
             <Text className="text-2xl font-bold text-gray-800">
-              {user.name}
+              {user.nombre}
             </Text>
             <View className="flex-row items-center">
               <Ionicons name="star" size={18} color="#FFD700" />
@@ -118,13 +146,27 @@ const UserProfileScreen = () => {
 
           {/* Recipes Grid */}
           <View className="flex-row flex-wrap justify-between mb-24">
-            {user.recipes.map((recipe) => (
-              <RecipeCard
-                key={recipe.id}
-                icon="open-outline"
-                iconFill="open"
-                {...recipe}
-              />
+            {loadingRecetas && <Text>Cargando recetas...</Text>}
+            {errorRecetas && (
+              <Text className="text-red-600">{errorRecetas}</Text>
+            )}
+            {!loadingRecetas && !errorRecetas && recetas.length === 0 && (
+              <Text>No tienes recetas todavía.</Text>
+            )}
+            {!loadingRecetas &&
+              !errorRecetas &&
+              recetas.map((recipe) => (
+                <Link
+                  href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
+                  key={recipe.idReceta}
+                  className="mr-2"
+                >
+                  <RecipeCard
+                    icon="open-outline"
+                    iconFill="open"
+                    {...recipe}
+                  />
+                </Link>
             ))}
           </View>
         </View>

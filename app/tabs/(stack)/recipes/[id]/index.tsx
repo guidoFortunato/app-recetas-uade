@@ -1,4 +1,4 @@
-import useProductsStore from "@/store/productsStore";
+import { obtenerRecetaPorId, RecetaRespuestaDTO } from "@/utils/api/recetas";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -14,8 +14,19 @@ import {
 } from "react-native";
 
 const RecipeDetailScreen = () => {
+  const { id } = useLocalSearchParams();
+  const navigation = useNavigation();
+
+  // Estados para la receta, loading y error
+  const [recipe, setRecipe] = useState<RecetaRespuestaDTO | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Estados para bookmark e imagen error
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [imageError, setImageError] = useState(false);
+
+  // Estados para reseñas (se mantienen igual)
   const [reviewTitle, setReviewTitle] = useState("");
   const [reviewDescription, setReviewDescription] = useState("");
   const [userRating, setUserRating] = useState(0);
@@ -44,73 +55,63 @@ const RecipeDetailScreen = () => {
     },
   ]);
 
-  const { id } = useLocalSearchParams();
-  const navigation = useNavigation();
+  // Carga la receta desde la API según el id
+  useEffect(() => {
+    if (!id) return;
 
-  const { recipes } = useProductsStore();
-  const recipe = recipes.find((recipe) => recipe.id === Number(id));
+    const cargarReceta = async () => {
+      setLoading(true);
+      try {
+        const receta = await obtenerRecetaPorId(Number(id));
+        setRecipe(receta);
+        setError(null);
+        setImageError(false); // reset imagen error
+      } catch (e) {
+        setError("No se pudo cargar la receta");
+        setRecipe(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // console.log({ recipe });
+    cargarReceta();
+  }, [id]);
 
-  if (!recipe) {
-    console.log("Receta no encontrada")
-  }
-
+  // Actualizar título de la pantalla
   useEffect(() => {
     navigation.setOptions({
-      title: recipe?.name,
+      title: recipe?.titulo ?? "Detalle de receta",
     });
-  }, [recipe, id, navigation])
+  }, [recipe, navigation]);
 
-  const ingredients = [
-    "250 g de masa para pizza básica",
-    "100 ml de salsa de tomate",
-    "150 g de queso mozzarella fresco",
-    "2 tomates cherry",
-    "Hojas de albahaca fresca",
-    "Aceite de oliva virgen extra de primera presión",
-    "Sal y pimienta al gusto",
-  ];
+  if (loading) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text>Cargando receta...</Text>
+      </View>
+    );
+  }
 
-  const steps = [
-    {
-      step: 1,
-      title: "Paso 1",
-      description:
-        "Para la masa, colocar todos los ingredientes en la batidora, hacer un volcán con la harina y agregar la levadura disuelta en agua tibia.",
-    },
-    {
-      step: 2,
-      title: "Paso 2",
-      description:
-        "Colocar en un recipiente y dejar leudar durante la madrugada a temperatura ambiente. Formar la masa, estirar con las manos hasta que quede bien fina.",
-    },
-    {
-      step: 3,
-      title: "Paso 3",
-      description:
-        "Agregar la salsa de tomate, el queso mozzarella cortado en cubos de 2 centímetros, salar, agregar aceite de oliva, hornear a fuego fuerte hasta que la masa esté dorada y el queso derretido.",
-    },
-    {
-      step: 4,
-      title: "Paso 4",
-      description:
-        "Retirar del horno y agregar las hojas de albahaca fresca para decorar y dar sabor. Servir.",
-    },
-    {
-      step: 5,
-      title: "Paso 5",
-      description:
-        "Combinar todos los ingredientes secos en un tazón grande. Hacer un volcán en el centro y agregar los ingredientes húmedos. Mezclar hasta formar una masa homogénea. Amasar durante 10 minutos, dejar reposar 1 hora hasta que duplique su tamaño. La masa debe quedar suave y elástica.",
-    },
-    {
-      step: 6,
-      title: "Paso 6",
-      description:
-        "Estirar la masa hasta conseguir y distribuirla sobre la bandeja de horno previamente engrasada. Agregar todos los ingredientes en el orden indicado. Llevar al horno precalentado fuerte hasta que la masa esté dorada y el queso derretido. Decorar con hojas de albahaca fresca.",
-    },
-  ];
+  if (error) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-red-600">{error}</Text>
+      </View>
+    );
+  }
 
+  if (!recipe) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text>No se encontró la receta</Text>
+      </View>
+    );
+  }
+
+  // Buscar URL imagen principal
+  const imagenReceta = recipe.multimedia.find((m) => m.tipo === "imagen")?.url;
+
+  // Función para renderizar estrellas (igual que antes)
   const renderStars = (
     rating: number,
     size: number = 16,
@@ -137,6 +138,7 @@ const RecipeDetailScreen = () => {
     );
   };
 
+  // Componente para mostrar cada reseña (igual que antes)
   const ReviewCard = ({ review }: { review: any }) => {
     const [avatarError, setAvatarError] = useState(false);
 
@@ -172,6 +174,7 @@ const RecipeDetailScreen = () => {
     );
   };
 
+  // Maneja envío de reseña (igual)
   const handleSubmitReview = () => {
     if (!reviewTitle || !reviewDescription || userRating === 0) {
       alert("Por favor completa todos los campos");
@@ -201,8 +204,6 @@ const RecipeDetailScreen = () => {
       <SafeAreaView className="flex-1">
         <StatusBar barStyle="dark-content" backgroundColor="white" />
 
-        {/* Content */}
-
         <ScrollView
           className="flex-1"
           showsVerticalScrollIndicator={false}
@@ -211,11 +212,9 @@ const RecipeDetailScreen = () => {
         >
           {/* Recipe Image */}
           <View className="relative">
-            {!imageError ? (
+            {!imageError && imagenReceta ? (
               <Image
-                source={{
-                  uri: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400&h=250&fit=crop&crop=center",
-                }}
+                source={{ uri: imagenReceta }}
                 className="w-full h-48"
                 resizeMode="cover"
                 onError={() => setImageError(true)}
@@ -230,7 +229,7 @@ const RecipeDetailScreen = () => {
           {/* Recipe Info */}
           <View className="px-4 py-4">
             <View className="flex-row items-center justify-between mb-2">
-              <Text className="text-xs text-gray-500">Matías Castillo</Text>
+              <Text className="text-xs text-gray-500">{recipe.usuario.alias}</Text>
               <TouchableOpacity
                 onPress={() => setIsBookmarked(!isBookmarked)}
                 activeOpacity={0.7}
@@ -244,22 +243,19 @@ const RecipeDetailScreen = () => {
             </View>
 
             <Text className="text-xl font-bold text-gray-800 mb-2">
-              Pizza Margarita
+              {recipe.titulo}
             </Text>
 
             <View className="flex-row items-center mb-4">
               <Ionicons name="star" size={16} color="#FFD700" />
               <Text className="text-sm font-medium text-gray-700 ml-1">
+                {/* acá podés calcular rating promedio real */}
                 8.5
               </Text>
             </View>
 
             <Text className="text-sm text-gray-600 leading-5">
-              Una pizza clásica italiana que se dice que fue creada en honor a
-              la reina Margarita de Saboya. Sus ingredientes representan los
-              colores de la bandera italiana: el rojo del tomate, el blanco de
-              la mozzarella y el verde de la albahaca. Es una receta simple pero
-              deliciosa que resalta la calidad de sus ingredientes.
+              {recipe.descripcion}
             </Text>
           </View>
 
@@ -268,11 +264,12 @@ const RecipeDetailScreen = () => {
             <Text className="text-lg font-bold text-gray-800 mb-3">
               Ingredientes:
             </Text>
-            {ingredients.map((ingredient, index) => (
+            {recipe.ingredientes.map((ingrediente, index) => (
               <View key={index} className="flex-row items-start mb-2">
                 <Text className="text-gray-600 mr-2">•</Text>
                 <Text className="text-sm text-gray-600 flex-1">
-                  {ingredient}
+                  {ingrediente.cantidad} {ingrediente.unidadMedida} de{" "}
+                  {ingrediente.nombre}
                 </Text>
               </View>
             ))}
@@ -283,13 +280,13 @@ const RecipeDetailScreen = () => {
             <Text className="text-lg font-bold text-gray-800 mb-4">
               Preparación
             </Text>
-            {steps.map((step, index) => (
-              <View key={step.step} className="mb-4">
+            {recipe.pasos.map((paso) => (
+              <View key={paso.numeroPaso} className="mb-4">
                 <Text className="text-sm font-semibold text-gray-800 mb-2">
-                  {step.title}
+                  Paso {paso.numeroPaso}
                 </Text>
                 <Text className="text-sm text-gray-600 leading-5">
-                  {step.description}
+                  {paso.descripcion}
                 </Text>
               </View>
             ))}
@@ -297,9 +294,7 @@ const RecipeDetailScreen = () => {
 
           {/* Reviews Section */}
           <View className="px-4 mb-6">
-            <Text className="text-lg font-bold text-gray-800 mb-4">
-              Reseñas
-            </Text>
+            <Text className="text-lg font-bold text-gray-800 mb-4">Reseñas</Text>
             {reviews.map((review) => (
               <ReviewCard key={review.id} review={review} />
             ))}
@@ -325,9 +320,7 @@ const RecipeDetailScreen = () => {
 
             {/* Description Input */}
             <View className="mb-4">
-              <Text className="text-gray-800 font-medium mb-2">
-                Descripción
-              </Text>
+              <Text className="text-gray-800 font-medium mb-2">Descripción</Text>
               <TextInput
                 value={reviewDescription}
                 onChangeText={setReviewDescription}
@@ -342,9 +335,7 @@ const RecipeDetailScreen = () => {
 
             {/* Rating */}
             <View className="mb-4">
-              <Text className="text-gray-800 font-medium mb-2">
-                Calificación
-              </Text>
+              <Text className="text-gray-800 font-medium mb-2">Calificación</Text>
               {renderStars(userRating, 24, setUserRating)}
             </View>
 

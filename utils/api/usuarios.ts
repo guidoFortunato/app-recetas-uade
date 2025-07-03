@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:8080/usuarios"; // Cambiá por tu dominio real
+const API = "http://10.0.2.2:8080/usuarios";
 
 export interface LoginRequestDTO {
   aliasOEmail: string;
@@ -26,6 +26,7 @@ export interface LoginResponseDTO {
   estadoRegistro: string;
   nombre: string;
   apellido: string;
+  contrasena: string;
 }
 
 export interface Usuario {
@@ -41,27 +42,33 @@ export interface Usuario {
 
 // 1. Login
 export const login = (dto: LoginRequestDTO): Promise<LoginResponseDTO> =>
-  axios.post(`${API}/login`, dto).then(res => res.data);
+  axios.post(`${API}/login`, dto)
+    .then(res => res.data);
 
 // 2. Registro inicial
 export const registrarUsuarioInicial = (dto: RegistroInicialDTO): Promise<Usuario> =>
-  axios.post(`${API}/registro-inicial`, dto).then(res => res.data);
+  axios.post(`${API}/registro-inicial`, dto)
+    .then(res => res.data);
 
 // 3. Completar registro
 export const completarRegistro = (id: number, dto: CompletarRegistroDTO): Promise<Usuario> =>
-  axios.put(`${API}/completar-registro/${id}`, dto).then(res => res.data);
+  axios.put(`${API}/completar-registro/${id}`, dto)
+    .then(res => res.data);
 
 // 4. Obtener todos los usuarios
 export const obtenerUsuarios = (): Promise<Usuario[]> =>
-  axios.get(`${API}`).then(res => res.data);
+  axios.get(`${API}`)
+    .then(res => res.data);
 
 // 5. Obtener usuario por ID
 export const obtenerUsuarioPorId = (id: number): Promise<Usuario> =>
-  axios.get(`${API}/${id}`).then(res => res.data);
+  axios.get(`${API}/${id}`)
+    .then(res => res.data);
 
 // 6. Obtener usuario por alias
 export const obtenerUsuarioPorAlias = (alias: string): Promise<Usuario> =>
-  axios.get(`${API}/alias/${alias}`).then(res => res.data);
+  axios.get(`${API}/alias/${alias}`)
+    .then(res => res.data);
 
 // 7. Obtener usuario por email (query param)
 export const obtenerUsuarioPorEmail = (email: string): Promise<Usuario> =>

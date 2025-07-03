@@ -3,7 +3,7 @@ import { SearchBar } from "@/components/searchBar";
 import useProductsStore from "@/store/productsStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -14,11 +14,31 @@ import {
   View
 } from "react-native";
 
+import { EstadoReceta, obtenerPorEstadoYVisibilidad, RecetaRespuestaDTO } from "@/utils/api/recetas";
 
 const HomeScreen = () => {
-  const { productCategories, recipes } = useProductsStore();
+  const { productCategories } = useProductsStore();
 
- 
+  // Estado local para recetas sugeridas cargadas desde API
+  const [recetasSugeridas, setRecetasSugeridas] = useState<RecetaRespuestaDTO[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const cargarRecetasSugeridas = async () => {
+      try {
+        setLoading(true);
+        const data = await obtenerPorEstadoYVisibilidad(EstadoReceta.aprobada, true);
+        setRecetasSugeridas(data);
+        setError(null);
+      } catch (e) {
+        setError((e as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    cargarRecetasSugeridas();
+  }, []);
 
   return (
     <SafeAreaView className="flex-1 bg-white mt-10">
@@ -126,13 +146,15 @@ const HomeScreen = () => {
             className="px-4"
             contentContainerStyle={{ paddingRight: 16 }}
           >
-            {recipes.map((recipe) => (
+            {loading && <Text className="px-4">Cargando recetas...</Text>}
+            {error && <Text className="px-4 text-red-600">{error}</Text>}
+            {!loading && !error && recetasSugeridas.map((recipe) => (
               <Link
-                href={`/tabs/(stack)/recipes/${recipe.id}`}
-                key={recipe.id}
+                href={`/tabs/(stack)/recipes/${recipe.idReceta}`} 
+                key={recipe.idReceta}
                 className="mr-2"
               >
-                <RecipeCard key={recipe.id} {...recipe} />
+                <RecipeCard {...recipe} />
               </Link>
             ))}
           </ScrollView>

@@ -1,75 +1,46 @@
 import { RecipeCard } from "@/components/recipes/RecipeCard";
-import { SearchBar } from "@/components/searchBar";
-import useProductsStore from "@/store/productsStore";
-import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
-
-import {
-  Dimensions,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
-
-const { width } = Dimensions.get("window");
-const cardWidth = (width - 48) / 2; // 2 columns with padding
+import { EstadoReceta, obtenerPorEstadoYVisibilidad, RecetaRespuestaDTO } from "@/utils/api/recetas";
+import React, { useEffect, useState } from "react";
+import { ScrollView, Text, View } from "react-native";
 
 const RecipesScreen = () => {
-  const { recipes } = useProductsStore();
+  const [recetas, setRecetas] = useState<RecetaRespuestaDTO[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const cargarRecetas = async () => {
+      try {
+        setLoading(true);
+        const data = await obtenerPorEstadoYVisibilidad(EstadoReceta.aprobada, true);
+        setRecetas(data);
+        setError(null);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarRecetas();
+  }, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-
-      {/* Header */}
-      <View className="px-4 pt-2">
-        {/* Search Bar */}
-        <SearchBar />
-
-        {/* Title */}
-        <Text className="text-xl font-bold text-gray-800 mb-4">
-          Recetas de Pizza
-        </Text>
-
-        {/* Filter and Sort Bar */}
-        <View className="flex-row items-center justify-between mb-4">
-          <View className="flex-row">
-            <TouchableOpacity className="flex-row items-center mr-4">
-              <Text className="text-gray-700 mr-1">Filtrar</Text>
-              <Ionicons name="chevron-down-outline" size={16} color="#666" />
-            </TouchableOpacity>
-
-            <TouchableOpacity className="flex-row items-center">
-              <Text className="text-gray-700 mr-1">Ordenar</Text>
-              <Ionicons name="chevron-down-outline" size={16} color="#666" />
-            </TouchableOpacity>
-          </View>
-
-          <Text className="text-sm text-gray-500">99 resultados</Text>
-        </View>
+    <ScrollView>
+      {loading && <Text>Cargando recetas...</Text>}
+      {error && <Text style={{ color: "red" }}>{error}</Text>}
+      {!loading && !error && recetas.length === 0 && <Text>No hay recetas disponibles.</Text>}
+      <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
+        {recetas.map((recipe) => (
+          <RecipeCard
+            key={recipe.idReceta}
+            {...recipe}
+            icon="open-outline"
+            iconFill="open"
+          />
+        ))}
       </View>
-
-      {/* Recipe Cards Grid */}
-      <ScrollView
-        className="flex-1 px-4"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      >
-        <View className="flex-row flex-wrap justify-between">
-          {recipes.map((recipe) => (
-            <Link
-              href={`/tabs/(stack)/recipes/${recipe.id}`}
-              key={recipe.id}
-            >
-              <RecipeCard key={recipe.id} {...recipe} />
-            </Link>
-          ))}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    </ScrollView>
   );
 };
 
