@@ -106,6 +106,17 @@ const AuthScreen = () => {
             Olvidaste tu contraseña?
           </Text>
         </View>
+        <View className="flex flex-row justify-center">
+          <Text className="text-sm text-neutral-500">
+            No tenes cuenta?
+          </Text>
+          <Text
+            className="text-sm text-primary underline font-semibold ml-1"
+            onPress={() => router.push("/auth/register")}
+          >
+            Regístrate
+          </Text>
+        </View>
       </View>
     </SafeAreaView>
   );

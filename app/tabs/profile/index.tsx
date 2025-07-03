@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 
-import { Link } from "expo-router";
+
 
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import useAuthStore from "@/store/authStore";
@@ -22,6 +22,7 @@ import { obtenerRecetasPorUsuario, RecetaRespuestaDTO } from "@/utils/api/receta
 const UserProfileScreen = () => {
   const { user, logout } = useAuthStore();
   const [avatarError, setAvatarError] = useState(false);
+  // console.dir({user}, {depth: null});
 
   // Estado para recetas
   const [recetas, setRecetas] = useState<RecetaRespuestaDTO[]>([]);
