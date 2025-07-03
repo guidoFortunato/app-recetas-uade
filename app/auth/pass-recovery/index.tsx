@@ -14,7 +14,7 @@ import {
   actualizarContrasena,
   solicitarCodigo,
   verificarCodigo,
-} from "@/utils/api/RecuperacionClave";
+} from "@/utils/api/recuperacionClave";
 
 const PassRecoveryScreen = () => {
   const [email, setEmail] = useState("");

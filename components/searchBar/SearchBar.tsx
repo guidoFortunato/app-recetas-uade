@@ -24,7 +24,7 @@ export const SearchBar = () => {
 
     // todo: resolver ir para atras si busco muchas veces
     // todo: el titulo tiene que cambiar en base al filtro
-    router.push(`/tabs/search?query=${searchQuery}`);
+    router.push(`/tabs/(stack)/search?query=${searchQuery}`);
     setSearchQuery("");
   };
 

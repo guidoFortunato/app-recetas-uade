@@ -19,8 +19,14 @@ interface ProductsState {
   recipes: Recipe[];
   searchRecipes: RecetaRespuestaDTO[];
   searchQuery: string;
+  favoritesRecipes: RecetaRespuestaDTO[];
+
   handleSearchQuery: (query: string) => void;
   handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => void;
+  handleFavoritesRecipes: (recipes: RecetaRespuestaDTO[]) => void;
+  addToFavorites: (recipe: RecetaRespuestaDTO) => void;
+  removeFromFavorites: (recipeId: number) => void;
+  clearFavorites: () => void;
 }
 
 const useProductsStore = create<ProductsState>((set) => ({
@@ -180,9 +186,25 @@ const useProductsStore = create<ProductsState>((set) => ({
       isBookmarked: false,
     },
   ],
+  favoritesRecipes: [],
 
   handleSearchQuery: (query: string) => set({ searchQuery: query }),
   handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => set({ searchRecipes: recipes }),
+  handleFavoritesRecipes: (recipes: RecetaRespuestaDTO[]) => set({ favoritesRecipes: recipes }),
+  addToFavorites: (recipe: RecetaRespuestaDTO) => 
+    set((state) => {
+      // Verificar si la receta ya está en favoritos
+      const isAlreadyFavorite = state.favoritesRecipes.some(fav => fav.idReceta === recipe.idReceta);
+      if (isAlreadyFavorite) {
+        return state; // No agregar si ya existe
+      }
+      return { favoritesRecipes: [...state.favoritesRecipes, recipe] };
+    }),
+  removeFromFavorites: (recipeId: number) => 
+    set((state) => ({
+      favoritesRecipes: state.favoritesRecipes.filter(recipe => recipe.idReceta !== recipeId)
+    })),
+  clearFavorites: () => set({ favoritesRecipes: [] }),
 }));
 
 export default useProductsStore;

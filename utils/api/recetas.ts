@@ -178,13 +178,15 @@ export enum TipoMultimedia {
   export async function obtenerRecetasIntentarPorUsuario(idUsuario: number): Promise<RecetaRespuestaDTO[]> {
     const res = await fetch(`${API_URL}/lista-recetas-intentar/${idUsuario}`)
     if (!res.ok) throw new Error("Error al obtener recetas guardadas")
-    return res.json()
+    const data = await res.json()
+    return data
   }
   
   export async function obtenerRecetasPorUsuario(idUsuario: number): Promise<RecetaRespuestaDTO[]> {
     const res = await fetch(`${API_URL}/usuario/${idUsuario}`)
     if (!res.ok) throw new Error("Error al obtener recetas del usuario")
-    return res.json()
+    const data = await res.json()
+    return data
   }
   
   export async function obtenerRecetasPorAliasUsuario(alias: string): Promise<RecetaRespuestaDTO[]> {

@@ -9,7 +9,7 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 
 const ProfileSearchScreen = () => {
@@ -56,28 +56,28 @@ const ProfileSearchScreen = () => {
         </View>
 
         {/* Lista de recetas */}
-        <View className="flex-row flex-wrap justify-between mb-24">
-            {/* {loadingRecetas && <Text>Cargando recetas...</Text>} */}
-            {/* {errorRecetas && (
+        <View className="flex-row flex-wrap justify-between mb-24 px-4">
+          {/* {loadingRecetas && <Text>Cargando recetas...</Text>} */}
+          {/* {errorRecetas && (
               <Text className="text-red-600">{errorRecetas}</Text>
             )} */}
-              {/* {!loadingRecetas && !errorRecetas && recetas.length === 0 && (
+          {/* {!loadingRecetas && !errorRecetas && recetas.length === 0 && (
                 <Text>No tienes recetas todavía.</Text>
               )} */}
-              {
-              searchRecipes.map((recipe) => (
-                <Link
-                  href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
-                  key={recipe.idReceta}
-                  className="mr-2"
-                >
-                  <RecipeCard
-                    
-                    {...recipe}
-                  />
-                </Link>
-            ))}
-          </View>
+          {searchRecipes.length > 0 ? (
+            searchRecipes.map((recipe) => (
+              <Link
+                href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
+                key={recipe.idReceta}
+                className="mr-2"
+              >
+                <RecipeCard {...recipe} />
+              </Link>
+            ))
+          ) : (
+            <Text className="text-gray-500">No se encontraron resultados</Text>
+          )}
+        </View>
 
         {/* {filteredUsers.length > 0 ? (
           <View className="flex-1">

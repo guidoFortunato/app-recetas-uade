@@ -1,3 +1,4 @@
+import useProductsStore from "@/store/productsStore";
 import { obtenerRecetaPorId, RecetaRespuestaDTO } from "@/utils/api/recetas";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
@@ -25,6 +26,9 @@ const RecipeDetailScreen = () => {
   // Estados para bookmark e imagen error
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [imageError, setImageError] = useState(false);
+
+  // Store para favoritos
+  const { removeFromFavorites, addToFavorites, favoritesRecipes } = useProductsStore();
 
   // Estados para reseñas (se mantienen igual)
   const [reviewTitle, setReviewTitle] = useState("");
@@ -54,6 +58,14 @@ const RecipeDetailScreen = () => {
       timeAgo: "3 días",
     },
   ]);
+
+  // Sincronizar el estado local con el estado global de favoritos
+  useEffect(() => {
+    if (recipe) {
+      const isInFavorites = favoritesRecipes.some(favRecipe => favRecipe.idReceta === recipe.idReceta);
+      setIsBookmarked(isInFavorites);
+    }
+  }, [favoritesRecipes, recipe]);
 
   // Carga la receta desde la API según el id
   useEffect(() => {
@@ -231,7 +243,13 @@ const RecipeDetailScreen = () => {
             <View className="flex-row items-center justify-between mb-2">
               <Text className="text-xs text-gray-500">{recipe.usuario.alias}</Text>
               <TouchableOpacity
-                onPress={() => setIsBookmarked(!isBookmarked)}
+                onPress={() => {
+                  if (isBookmarked) {
+                    removeFromFavorites(recipe.idReceta);
+                  } else {
+                    addToFavorites(recipe);
+                  }
+                }}
                 activeOpacity={0.7}
               >
                 <Ionicons

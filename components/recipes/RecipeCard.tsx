@@ -1,13 +1,8 @@
+import useProductsStore from "@/store/productsStore";
 import type { RecetaRespuestaDTO } from "@/utils/api/recetas";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
-import {
-  Dimensions,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useEffect, useState } from "react";
+import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 
 const { width } = Dimensions.get("window");
 const cardWidth = (width - 48) / 2;
@@ -21,15 +16,54 @@ export const RecipeCard = ({
   idReceta,
   titulo,
   usuario,
+  descripcion,
+  cantidadPersonas,
   multimedia,
+  pasos,
+  ingredientes,
+  publico,
+  categoria,
+  fechaCreacion,
   icon = "bookmark-outline",
   iconFill = "bookmark",
 }: Props) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const { removeFromFavorites, addToFavorites, favoritesRecipes } = useProductsStore();
+
+  // Sincronizar el estado local con el estado global de favoritos
+  useEffect(() => {
+    const isInFavorites = favoritesRecipes.some(recipe => recipe.idReceta === idReceta);
+    setIsBookmarked(isInFavorites);
+  }, [favoritesRecipes, idReceta]);
 
   const imageUrl =
     multimedia?.find((m) => m.tipo === "imagen")?.url ??
     "https://via.placeholder.com/150"; // fallback por si no hay imagen
+
+  const handleBookmark = () => {
+    if (isBookmarked) {
+      removeFromFavorites(idReceta);
+      // todo: llamada al metodo para removerlo en la bbdd
+      // TODO: mostrar un mensaje de que se desmarcó como favorita
+    } else {
+      addToFavorites({
+        idReceta,
+        titulo,
+        usuario,
+        descripcion,
+        cantidadPersonas,
+        multimedia,
+        pasos,
+        ingredientes,
+        publico,
+        categoria,
+        fechaCreacion,
+      });
+      // todo: llamada al metodo para agregarlo en la bbdd
+      // TODO: mostrar un mensaje de que se marcó como favorita
+    }
+    // No necesitamos setIsBookmarked aquí porque useEffect se encargará de sincronizar
+  };
 
   return (
     <View
@@ -46,7 +80,7 @@ export const RecipeCard = ({
         {/* Botón de guardar */}
         <TouchableOpacity
           className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full items-center justify-center shadow-sm"
-          onPress={() => setIsBookmarked(!isBookmarked)}
+          onPress={handleBookmark}
           activeOpacity={0.7}
         >
           <Ionicons
