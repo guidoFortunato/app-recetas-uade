@@ -45,7 +45,7 @@ export const login = (dto: LoginRequestDTO): Promise<LoginResponseDTO> =>
   axios.post(`${API}/login`, dto)
     .then(res => res.data)
     .catch(error => {
-      console.error("Error en login:", error);
+      //console.error("Error en login:", error);
       throw error;
     });
 
@@ -54,7 +54,7 @@ export const registrarUsuarioInicial = (dto: RegistroInicialDTO): Promise<Usuari
   axios.post(`${API}/registro-inicial`, dto)
     .then(res => res.data)
     .catch(error => {
-      console.error("Error en registro inicial:", error);
+      //console.error("Error en registro inicial:", error);
       throw error;
     });
 
@@ -63,7 +63,7 @@ export const completarRegistro = (id: number, dto: CompletarRegistroDTO): Promis
   axios.put(`${API}/completar-registro/${id}`, dto)
     .then(res => res.data)
     .catch(error => {
-      console.error("Error en completar registro:", error);
+      //console.error("Error en completar registro:", error);
       throw error;
     });
 
@@ -72,7 +72,7 @@ export const obtenerUsuarios = (): Promise<Usuario[]> =>
   axios.get(`${API}`)
     .then(res => res.data)
     .catch(error => {
-      console.error("Error en obtener usuarios:", error);
+      //console.error("Error en obtener usuarios:", error);
       throw error;
     });
 
@@ -81,7 +81,7 @@ export const obtenerUsuarioPorId = (id: number): Promise<Usuario> =>
   axios.get(`${API}/${id}`)
     .then(res => res.data)
     .catch(error => {
-      console.error("Error en obtener usuario por ID:", error);
+      //console.error("Error en obtener usuario por ID:", error);
       throw error;
     });
 
@@ -90,7 +90,7 @@ export const obtenerUsuarioPorAlias = (alias: string): Promise<Usuario> =>
   axios.get(`${API}/alias/${alias}`)
     .then(res => res.data)
     .catch(error => {
-      console.error("Error en obtener usuario por alias:", error);
+      //console.error("Error en obtener usuario por alias:", error);
       throw error;
     });
 
@@ -99,7 +99,7 @@ export const obtenerUsuarioPorEmail = (email: string): Promise<Usuario> =>
   axios.get(`${API}/email`, { params: { email } })
     .then(res => res.data)
     .catch(error => {
-      console.error("Error en obtener usuario por email:", error);
+      //console.error("Error en obtener usuario por email:", error);
       throw error;
     });
 
@@ -108,13 +108,13 @@ export const actualizarUsuario = (id: number, usuarioActualizado: Partial<Usuari
   axios.put(`${API}/${id}`, usuarioActualizado)
     .then(res => res.data)
     .catch(error => {
-      console.error("Error en actualizar usuario:", error);
+      //console.error("Error en actualizar usuario:", error);
       throw error;
     });
 
 // 9. Eliminar usuario
 export const eliminarUsuario = (id: number): Promise<void> =>
   axios.delete(`${API}/${id}`).then(() => {}).catch(error => {
-    console.error("Error en eliminar usuario:", error);
+    //console.error("Error en eliminar usuario:", error);
     throw error;
   });
