@@ -269,6 +269,7 @@ const RecipeDetailScreen = () => {
                   key={i}
                   review={{
                     id: i,
+                    title: "",
                     rating: v.puntaje,
                     description: v.comentario,
                     author: v.usuario.alias,

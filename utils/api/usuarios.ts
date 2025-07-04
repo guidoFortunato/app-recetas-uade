@@ -40,6 +40,11 @@ export interface Usuario {
   apellido: string;
 }
 
+export interface RecetaListaIntentarDTO {
+  idUsuario: number;
+  idReceta: number;
+}
+
 // 1. Login
 export const login = (dto: LoginRequestDTO): Promise<LoginResponseDTO> =>
   axios.post(`${API}/login`, dto)
@@ -118,3 +123,25 @@ export const eliminarUsuario = (id: number): Promise<void> =>
     //console.error("Error en eliminar usuario:", error);
     throw error;
   });
+
+  // Agregar receta a la lista de intentar
+export const agregarRecetaAListaIntentar = (
+  dto: RecetaListaIntentarDTO
+): Promise<string> =>
+  axios
+    .post(`${API}/agregar-a-lista-intentar`, dto)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
+
+// Quitar receta de la lista de intentar
+export const quitarRecetaDeListaIntentar = (
+  dto: RecetaListaIntentarDTO
+): Promise<string> =>
+  axios
+    .delete(`${API}/quitar-de-lista-intentar`, { data: dto }) // el body va en `data` en DELETE
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
