@@ -63,8 +63,7 @@ const BusquedaCategoriaScreen = () => {
           >
             <RecipeCard
               {...recipe}
-              icon="open-outline"
-              iconFill="open"
+              
             />
           </Link>
         ))}

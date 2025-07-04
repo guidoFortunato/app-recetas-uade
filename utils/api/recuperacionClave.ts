@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://10.0.2.2:8080/recuperacion-clave";
+const API = "https://api-recetas-render.onrender.com/recuperacion-clave";
 
 // 1. Solicitar código de recuperación
 export const solicitarCodigo = (email: string): Promise<string> =>

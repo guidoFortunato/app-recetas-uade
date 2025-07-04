@@ -49,7 +49,7 @@ const TabsLayout = () => {
       <Tabs.Screen
         name="notifications/index"
         options={{
-          title: "Notificaciones",
+          title: "Explorar",
           tabBarIcon: ({ color }) => (
             <Ionicons size={28} name="compass-outline" color={color} />
           ),

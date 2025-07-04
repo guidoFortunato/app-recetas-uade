@@ -15,11 +15,12 @@ import {
   ActivityIndicator,
   Modal,
   SafeAreaView,
+  ScrollView,
   StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 
 const ProfileSearchScreen = () => {
@@ -30,7 +31,6 @@ const ProfileSearchScreen = () => {
   const [loadingFiltro, setLoadingFiltro] = useState(false);
   const [errorFiltro, setErrorFiltro] = useState<string | null>(null);
 
-  // Leer parámetro de búsqueda del SearchBar (query en la URL)
   const { query } = useLocalSearchParams<{ query: string }>();
 
   const aplicarFiltroHandler = async () => {
@@ -39,33 +39,35 @@ const ProfileSearchScreen = () => {
 
     try {
       let recetas: RecetaRespuestaDTO[] = [];
-
-      // Usar parámetro del SearchBar como búsqueda principal para receta o usuario
       const valorBusqueda = query?.trim() || "";
 
       if (filtroSeleccionado === "receta") {
         recetas = await obtenerRecetasPorTitulo(valorBusqueda);
       } else if (filtroSeleccionado === "alias") {
         recetas = await obtenerRecetasPorAliasUsuario(valorBusqueda);
-      } else if (filtroSeleccionado === "ingrediente_si") {
+      } else if (filtroSeleccionado === "ingrediente_si" || filtroSeleccionado === "ingrediente_no") {
         if (!inputFiltro.trim()) {
           setErrorFiltro("Por favor ingresa el ingrediente.");
           setLoadingFiltro(false);
           return;
         }
-        recetas = await obtenerRecetasPorIngrediente(inputFiltro.trim());
-      } else if (filtroSeleccionado === "ingrediente_no") {
-        if (!inputFiltro.trim()) {
-          setErrorFiltro("Por favor ingresa el ingrediente.");
-          setLoadingFiltro(false);
-          return;
-        }
-        recetas = await obtenerRecetasPorNoIngrediente(inputFiltro.trim());
+
+        // Primero, buscar recetas por el título del SearchBar
+        let recetasBase = await obtenerRecetasPorTitulo(valorBusqueda);
+
+        // Luego, filtrar en el backend por presencia/ausencia del ingrediente
+        const recetasFiltradas = filtroSeleccionado === "ingrediente_si"
+          ? await obtenerRecetasPorIngrediente(inputFiltro.trim())
+          : await obtenerRecetasPorNoIngrediente(inputFiltro.trim());
+
+        // Combinar: solo dejar recetas que aparezcan en ambas listas (por id)
+        const idsFiltradas = new Set(recetasFiltradas.map((r) => r.idReceta));
+        recetas = recetasBase.filter((r) => idsFiltradas.has(r.idReceta));
       }
 
       handleSearchRecipes(recetas);
       setModalVisible(false);
-      setInputFiltro(""); // Limpiar input tras aplicar filtro
+      setInputFiltro("");
     } catch (error) {
       console.error(error);
       setErrorFiltro("Hubo un error al aplicar el filtro.");
@@ -79,13 +81,15 @@ const ProfileSearchScreen = () => {
       <SafeAreaView className="flex-1">
         <StatusBar barStyle="dark-content" backgroundColor="white" />
 
-        {/* Header */}
         <View className="px-4 pt-2">
           <SearchBar />
 
-          <Text className="text-xl font-bold text-gray-800 mb-4">Recetas</Text>
+          <Text className="text-xl font-bold text-gray-800 mb-4">
+            {filtroSeleccionado === "alias" && query?.trim()
+              ? `Recetas de ${query.trim()}`
+              : "Recetas"}
+          </Text>
 
-          {/* Filtrar */}
           <View className="flex-row items-center justify-between mb-4">
             <View className="flex-row">
               <TouchableOpacity
@@ -107,24 +111,24 @@ const ProfileSearchScreen = () => {
           </View>
         </View>
 
-        {/* Lista de recetas */}
-        <View className="flex-row flex-wrap justify-between mb-24 px-4">
-          {searchRecipes.length === 0 ? (
-            <Text className="text-gray-500">No hay recetas encontradas.</Text>
-          ) : (
-            searchRecipes.map((recipe) => (
-              <Link
-                href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
-                key={recipe.idReceta}
-                className="mb-4 w-[48%]"
-              >
-                <RecipeCard icon="open-outline" iconFill="open" {...recipe} />
-              </Link>
-            ))
-          )}
-        </View>
+        <ScrollView className="flex-1 px-4 mb-24">
+          <View className="flex-row flex-wrap justify-between">
+            {searchRecipes.length === 0 ? (
+              <Text className="text-gray-500">No hay recetas encontradas.</Text>
+            ) : (
+              searchRecipes.map((recipe) => (
+                <Link
+                  href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
+                  key={recipe.idReceta}
+                  className="mb-4 w-[48%]"
+                >
+                  <RecipeCard {...recipe} />
+                </Link>
+              ))
+            )}
+          </View>
+        </ScrollView>
 
-        {/* Modal de filtros */}
         <Modal
           animationType="fade"
           transparent={true}
@@ -135,11 +139,10 @@ const ProfileSearchScreen = () => {
             setErrorFiltro(null);
           }}
         >
-          <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+          <View className="flex-1 justify-center items-center bg-gray-200 bg-opacity-50">
             <View className="bg-white rounded-lg p-4 w-72">
               <Text className="text-lg font-bold mb-3 text-center">Filtrar por:</Text>
 
-              {/* Opciones de filtro */}
               <TouchableOpacity
                 className="py-2"
                 onPress={() => setFiltroSeleccionado("receta")}
@@ -173,7 +176,6 @@ const ProfileSearchScreen = () => {
                 </Text>
               </TouchableOpacity>
 
-              {/* Input solo para ingredientes */}
               {(filtroSeleccionado === "ingrediente_si" || filtroSeleccionado === "ingrediente_no") && (
                 <TextInput
                   placeholder="Nombre del ingrediente..."
@@ -183,12 +185,10 @@ const ProfileSearchScreen = () => {
                 />
               )}
 
-              {/* Error */}
               {errorFiltro && (
                 <Text className="text-red-600 text-center mt-2">{errorFiltro}</Text>
               )}
 
-              {/* Botones */}
               {loadingFiltro ? (
                 <ActivityIndicator size="small" color="#000" className="mt-4" />
               ) : (
