@@ -1,7 +1,10 @@
 import useAuthStore from "@/store/authStore";
 import useProductsStore from "@/store/productsStore";
 import { type RecetaRespuestaDTO } from "@/utils/api/recetas";
-import { agregarRecetasFavoritas, quitarRecetaDeFavoritos } from "@/utils/api/usuarios";
+import {
+  agregarRecetasFavoritas,
+  quitarRecetaDeFavoritos,
+} from "@/utils/api/usuarios";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
@@ -52,10 +55,11 @@ export const RecipeCard = ({
       if (isBookmarked) {
         await quitarRecetaDeFavoritos(user.idUsuario, idReceta);
         removeFromFavorites(idReceta);
-        // todo: llamada al metodo para removerlo en la bbdd
+
         // TODO: mostrar un mensaje de que se desmarcó como favorita
       } else {
         await agregarRecetasFavoritas(user.idUsuario, idReceta);
+        // todo: poner disabled en el boton
         addToFavorites({
           idReceta,
           titulo,
@@ -74,7 +78,6 @@ export const RecipeCard = ({
       }
     } catch (error) {
       console.error("Error al agregar receta a favoritos:", error);
-      // TODO: mostrar un mensaje de error al usuario
     }
   };
 

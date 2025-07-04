@@ -145,6 +145,7 @@ export const eliminarUsuario = (id: number): Promise<void> =>
     throw error;
   });
 
+/*
   // Agregar receta a la lista de intentar
 export const agregarRecetasFavoritas = (
   dto: RecetaListaIntentarDTO
@@ -155,14 +156,44 @@ export const agregarRecetasFavoritas = (
     .catch((error) => {
       throw error;
     });
+*/
+
+// 10. Obtener recetas favoritas de un usuario
+export const agregarRecetasFavoritas = async (
+  idUsuario: number,
+  idReceta: number
+): Promise<string> => {
+  try {
+    const response = await axios.post(`${API}/agregar-a-lista-intentar`, {
+      idUsuario,
+      idReceta,
+    });
+    // console.log({ response: response.data });
+    return response.data;
+  } catch (error) {
+    console.error("Error en obtener recetas favoritas:", error);
+    throw error;
+  }
+};
+
+// export const agregarRecetaAListaIntentar = (
+//   dto: RecetaListaIntentarDTO
+// ): Promise<string> =>
+//   axios
+//     .post(${API}/agregar-a-lista-intentar, dto)
+//     .then((res) => res.data)
+//     .catch((error) => {
+//       throw error;
+//     });
 
 // Quitar receta de la lista de intentar
 export const quitarRecetaDeFavoritos = (
-  dto: RecetaListaIntentarDTO
+  idUsuario: number,
+  idReceta: number
 ): Promise<string> =>
   axios
-    .delete(`${API}/quitar-de-lista-intentar`, { data: dto }) // el body va en `data` en DELETE
-    .then((res) => res.data)
+    .delete(`${API}/quitar-de-lista-intentar`, { data: { idUsuario, idReceta } }) // el body va en data en DELETE
+    .then((res) => res.data)  
     .catch((error) => {
       throw error;
     });
