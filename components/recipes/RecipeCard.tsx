@@ -1,13 +1,10 @@
-import type { RecetaRespuestaDTO } from "@/utils/api/recetas";
+import useAuthStore from "@/store/authStore";
+import useProductsStore from "@/store/productsStore";
+import { type RecetaRespuestaDTO } from "@/utils/api/recetas";
+import { agregarRecetasFavoritas, quitarRecetaDeFavoritos } from "@/utils/api/usuarios";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
-import {
-  Dimensions,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useEffect, useState } from "react";
+import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 
 const { width } = Dimensions.get("window");
 const cardWidth = (width - 48) / 2;
@@ -21,15 +18,65 @@ export const RecipeCard = ({
   idReceta,
   titulo,
   usuario,
+  descripcion,
+  cantidadPersonas,
   multimedia,
+  pasos,
+  ingredientes,
+  publico,
+  categoria,
+  fechaCreacion,
   icon = "bookmark-outline",
   iconFill = "bookmark",
 }: Props) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
 
+  const { removeFromFavorites, addToFavorites, favoritesRecipes } =
+    useProductsStore();
+  const { user } = useAuthStore();
+
+  // Sincronizar el estado local con el estado global de favoritos
+  useEffect(() => {
+    const isInFavorites = favoritesRecipes.some(
+      (recipe) => recipe.idReceta === idReceta
+    );
+    setIsBookmarked(isInFavorites);
+  }, [favoritesRecipes, idReceta]);
+
   const imageUrl =
     multimedia?.find((m) => m.tipo === "imagen")?.url ??
     "https://i.imgur.com/SmMtt1x.png"; // fallback por si no hay imagen
+
+  const handleBookmark = async () => {
+    try {
+      if (isBookmarked) {
+        await quitarRecetaDeFavoritos(user.idUsuario, idReceta);
+        removeFromFavorites(idReceta);
+        // todo: llamada al metodo para removerlo en la bbdd
+        // TODO: mostrar un mensaje de que se desmarcó como favorita
+      } else {
+        await agregarRecetasFavoritas(user.idUsuario, idReceta);
+        addToFavorites({
+          idReceta,
+          titulo,
+          usuario,
+          descripcion,
+          cantidadPersonas,
+          multimedia,
+          pasos,
+          ingredientes,
+          publico,
+          categoria,
+          fechaCreacion,
+        });
+
+        // TODO: mostrar un mensaje de que se marcó como favorita
+      }
+    } catch (error) {
+      console.error("Error al agregar receta a favoritos:", error);
+      // TODO: mostrar un mensaje de error al usuario
+    }
+  };
 
   return (
     <View
@@ -46,7 +93,7 @@ export const RecipeCard = ({
         {/* Botón de guardar */}
         <TouchableOpacity
           className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full items-center justify-center shadow-sm"
-          onPress={() => setIsBookmarked(!isBookmarked)}
+          onPress={handleBookmark}
           activeOpacity={0.7}
         >
           <Ionicons

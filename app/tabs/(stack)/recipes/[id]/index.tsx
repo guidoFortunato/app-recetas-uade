@@ -1,3 +1,4 @@
+import useProductsStore from "@/store/productsStore";
 import { obtenerRecetaPorId, obtenerValoracionesAprobadasPorReceta, RecetaRespuestaDTO, ValoracionRecetaDTO } from "@/utils/api/recetas";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
@@ -23,11 +24,24 @@ const RecipeDetailScreen = () => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [imageError, setImageError] = useState(false);
 
+  // Store para favoritos
+  const { removeFromFavorites, addToFavorites, favoritesRecipes } = useProductsStore();
+
+  // Estados para reseñas (se mantienen igual)
   const [reviewTitle, setReviewTitle] = useState("");
   const [reviewDescription, setReviewDescription] = useState("");
   const [userRating, setUserRating] = useState(0);
   const [valoraciones, setValoraciones] = useState<ValoracionRecetaDTO[]>([]);
 
+  // Sincronizar el estado local con el estado global de favoritos
+  useEffect(() => {
+    if (recipe) {
+      const isInFavorites = favoritesRecipes.some(favRecipe => favRecipe.idReceta === recipe.idReceta);
+      setIsBookmarked(isInFavorites);
+    }
+  }, [favoritesRecipes, recipe]);
+
+  // Carga la receta desde la API según el id
   useEffect(() => {
     if (!id) return;
 
@@ -39,6 +53,7 @@ const RecipeDetailScreen = () => {
         setError(null);
         setImageError(false);
       } catch (e) {
+        console.error("Error al cargar la receta", e);
         setError("No se pudo cargar la receta");
         setRecipe(null);
       } finally {
@@ -204,7 +219,13 @@ const RecipeDetailScreen = () => {
             <View className="flex-row items-center justify-between mb-2">
               <Text className="text-xs text-gray-500">{recipe.usuario.alias}</Text>
               <TouchableOpacity
-                onPress={() => setIsBookmarked(!isBookmarked)}
+                onPress={() => {
+                  if (isBookmarked) {
+                    removeFromFavorites(recipe.idReceta);
+                  } else {
+                    addToFavorites(recipe);
+                  }
+                }}
                 activeOpacity={0.7}
               >
                 <Ionicons

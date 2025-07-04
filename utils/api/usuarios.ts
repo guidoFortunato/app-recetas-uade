@@ -45,74 +45,95 @@ export interface RecetaListaIntentarDTO {
   idReceta: number;
 }
 
+export interface RecetaListaIntentarDTO {
+  idUsuario: number;
+  idReceta: number;
+}
+
 // 1. Login
 export const login = (dto: LoginRequestDTO): Promise<LoginResponseDTO> =>
-  axios.post(`${API}/login`, dto)
-    .then(res => res.data)
-    .catch(error => {
+  axios
+    .post(`${API}/login`, dto)
+    .then((res) => res.data)
+    .catch((error) => {
       //console.error("Error en login:", error);
       throw error;
     });
 
 // 2. Registro inicial
-export const registrarUsuarioInicial = (dto: RegistroInicialDTO): Promise<Usuario> =>
-  axios.post(`${API}/registro-inicial`, dto)
-    .then(res => res.data)
-    .catch(error => {
+export const registrarUsuarioInicial = (
+  dto: RegistroInicialDTO
+): Promise<Usuario> =>
+  axios
+    .post(`${API}/registro-inicial`, dto)
+    .then((res) => res.data)
+    .catch((error) => {
       //console.error("Error en registro inicial:", error);
       throw error;
     });
 
 // 3. Completar registro
-export const completarRegistro = (id: number, dto: CompletarRegistroDTO): Promise<Usuario> =>
-  axios.put(`${API}/completar-registro/${id}`, dto)
-    .then(res => res.data)
-    .catch(error => {
+export const completarRegistro = (
+  id: number,
+  dto: CompletarRegistroDTO
+): Promise<Usuario> =>
+  axios
+    .put(`${API}/completar-registro/${id}`, dto)
+    .then((res) => res.data)
+    .catch((error) => {
       //console.error("Error en completar registro:", error);
       throw error;
     });
 
 // 4. Obtener todos los usuarios
 export const obtenerUsuarios = (): Promise<Usuario[]> =>
-  axios.get(`${API}`)
-    .then(res => res.data)
-    .catch(error => {
+  axios
+    .get(`${API}`)
+    .then((res) => res.data)
+    .catch((error) => {
       //console.error("Error en obtener usuarios:", error);
       throw error;
     });
 
 // 5. Obtener usuario por ID
 export const obtenerUsuarioPorId = (id: number): Promise<Usuario> =>
-  axios.get(`${API}/${id}`)
-    .then(res => res.data)
-    .catch(error => {
+  axios
+    .get(`${API}/${id}`)
+    .then((res) => res.data)
+    .catch((error) => {
       //console.error("Error en obtener usuario por ID:", error);
       throw error;
     });
 
 // 6. Obtener usuario por alias
 export const obtenerUsuarioPorAlias = (alias: string): Promise<Usuario> =>
-  axios.get(`${API}/alias/${alias}`)
-    .then(res => res.data)
-    .catch(error => {
+  axios
+    .get(`${API}/alias/${alias}`)
+    .then((res) => res.data)
+    .catch((error) => {
       //console.error("Error en obtener usuario por alias:", error);
       throw error;
     });
 
 // 7. Obtener usuario por email (query param)
 export const obtenerUsuarioPorEmail = (email: string): Promise<Usuario> =>
-  axios.get(`${API}/email`, { params: { email } })
-    .then(res => res.data)
-    .catch(error => {
+  axios
+    .get(`${API}/email`, { params: { email } })
+    .then((res) => res.data)
+    .catch((error) => {
       //console.error("Error en obtener usuario por email:", error);
       throw error;
     });
 
 // 8. Actualizar datos del usuario
-export const actualizarUsuario = (id: number, usuarioActualizado: Partial<Usuario>): Promise<Usuario> =>
-  axios.put(`${API}/${id}`, usuarioActualizado)
-    .then(res => res.data)
-    .catch(error => {
+export const actualizarUsuario = (
+  id: number,
+  usuarioActualizado: Partial<Usuario>
+): Promise<Usuario> =>
+  axios
+    .put(`${API}/${id}`, usuarioActualizado)
+    .then((res) => res.data)
+    .catch((error) => {
       //console.error("Error en actualizar usuario:", error);
       throw error;
     });
