@@ -146,7 +146,7 @@ export const eliminarUsuario = (id: number): Promise<void> =>
   });
 
   // Agregar receta a la lista de intentar
-export const agregarRecetaAListaIntentar = (
+export const agregarRecetasFavoritas = (
   dto: RecetaListaIntentarDTO
 ): Promise<string> =>
   axios
@@ -157,7 +157,7 @@ export const agregarRecetaAListaIntentar = (
     });
 
 // Quitar receta de la lista de intentar
-export const quitarRecetaDeListaIntentar = (
+export const quitarRecetaDeFavoritos = (
   dto: RecetaListaIntentarDTO
 ): Promise<string> =>
   axios
