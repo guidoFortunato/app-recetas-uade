@@ -45,11 +45,6 @@ export interface RecetaListaIntentarDTO {
   idReceta: number;
 }
 
-export interface RecetaListaIntentarDTO {
-  idUsuario: number;
-  idReceta: number;
-}
-
 // 1. Login
 export const login = (dto: LoginRequestDTO): Promise<LoginResponseDTO> =>
   axios
