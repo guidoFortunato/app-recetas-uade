@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API = "https://api-recetas-render.onrender.com/categoria-recetas";
+//const API = "https://api-recetas-render.onrender.com/categoria-recetas";
+const API = "http://10.0.2.2:8080/categoria-recetas";
 
 // Tipo que representa la categoría
 export interface CategoriaReceta {
