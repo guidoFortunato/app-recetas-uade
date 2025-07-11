@@ -1,22 +1,15 @@
-import { LoginResponseDTO } from "@/utils/api/usuarios";
-import { create } from "zustand";
+import React from "react";
 
-// interface Recipe {
-//   id: number;
-//   name: string;
-//   rating: number;
-//   image: string;
-//   hasExternalLink: boolean;
-// }
-/* 
-interface User {
-  idUsuario: LoginResponseDTO["idUsuario"];
-  email: LoginResponseDTO["email"];
-  contrasena: LoginResponseDTO["contrasena"];
-  nombre?: LoginResponseDTO["nombre"];
-  apellido?: LoginResponseDTO["apellido"];
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+
+import { LoginResponseDTO } from "@/utils/api/usuarios";
+
+// Extender LoginResponseDTO para incluir expires_in
+interface AuthUser extends LoginResponseDTO {
+  expires_in?: number; // Timestamp de expiración
 }
-*/
 
 interface SearchUser {
   id: number;
@@ -28,50 +21,16 @@ interface SearchUser {
 }
 
 // Datos de prueba
-const user: User = {
+const user: AuthUser = {
   idUsuario: 1,
+  alias: "test",
   email: "test@test.com",
+  tipoUsuario: "USUARIO",
+  estadoRegistro: "COMPLETADO",
+  nombre: "Nicolas",
+  apellido: "Alvarez",
   contrasena: "123456",
-  code: "5",
-  name: "Nicolas Alvarez",
-  avatar:
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
-  pizzaImage:
-    "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=300&h=180&fit=crop&crop=center",
-  recipes: [
-    {
-      id: 1,
-      name: "Pizza Pepperoni",
-      rating: 9.8,
-      image:
-        "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=200&h=150&fit=crop&crop=center",
-      hasExternalLink: true,
-    },
-    {
-      id: 2,
-      name: "Pasta Carbonara",
-      rating: 9.6,
-      image:
-        "https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?w=200&h=150&fit=crop&crop=center",
-      hasExternalLink: true,
-    },
-    {
-      id: 3,
-      name: "Sopa de Calabaza",
-      rating: 8.4,
-      image:
-        "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=200&h=150&fit=crop&crop=center",
-      hasExternalLink: true,
-    },
-    {
-      id: 4,
-      name: "Sushi Roll",
-      rating: 9.2,
-      image:
-        "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=200&h=150&fit=crop&crop=center",
-      hasExternalLink: true,
-    },
-  ],
+  expires_in: Date.now() + (24 * 60 * 60 * 1000), // 24 horas desde ahora
 };
 const searchUsers: SearchUser[] = [
   {
@@ -107,56 +66,135 @@ const searchUsers: SearchUser[] = [
 ];
 
 interface AuthState {
-  user: LoginResponseDTO;
+  // state
+  user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   isPassRecovery: boolean;
   searchUsers: SearchUser[];
-  login: (userData: LoginResponseDTO) => void;
-  register: (userData: LoginResponseDTO) => void;
+
+  // actions
+  setUser: (user: AuthUser) => void;
+  login: (userData: LoginResponseDTO, expiresIn?: number) => void;
+  register: (userData: LoginResponseDTO, expiresIn?: number) => void;
   passRecovery: (email: string) => void;
   updatePassword: (newPassword: string) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
+  checkAuthExpiration: () => boolean;
 }
 
-const useAuthStore = create<AuthState>()((set) => ({
-  user,
-  searchUsers,
-  isAuthenticated: false,
-  isLoading: false,
-  isPassRecovery: false,
-  login: (userData: LoginResponseDTO) =>
-    set({
-      user: userData,
-      isAuthenticated: true,
-    }),
-  register: (userData: LoginResponseDTO) =>
-    set({
-      user: userData,
-      isAuthenticated: true,
-    }),
-  passRecovery: (email: string) =>
-    set({
-      isPassRecovery: true,
-    }),
-  updatePassword: (newPassword: string) =>
-    set((state) => {
-      // Actualizar el usuario en el store
-      const updatedUser = { ...state.user, password: newPassword };
-
-      return {
-        user: updatedUser,
-      };
-    }),
-  logout: () =>
-    set({
+const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      // state
+      user: null,
+      searchUsers,
       isAuthenticated: false,
+      isLoading: false,
+      isPassRecovery: false,
+
+      // actions
+      setUser: (user: AuthUser) => set({ user }),
+      login: (userData: LoginResponseDTO, expiresIn: number = 24 * 60 * 60 * 1000) => {
+        const authUser: AuthUser = {
+          ...userData,
+          expires_in: Date.now() + expiresIn, // expiresIn en milisegundos
+        };
+        
+        set({
+          user: authUser,
+          isAuthenticated: true,
+        });
+      },
+      
+      register: (userData: LoginResponseDTO, expiresIn: number = 24 * 60 * 60 * 1000) => {
+        const authUser: AuthUser = {
+          ...userData,
+          expires_in: Date.now() + expiresIn,
+        };
+        
+        set({
+          user: authUser,
+          isAuthenticated: true,
+        });
+      },
+      
+      passRecovery: (email: string) =>
+        set({
+          isPassRecovery: true,
+        }),
+      
+      updatePassword: (newPassword: string) =>
+        set((state) => {
+          if (!state.user) return state;
+          
+          const updatedUser = { ...state.user, contrasena: newPassword };
+          return {
+            user: updatedUser,
+          };
+        }),
+      
+      logout: () =>
+        set({
+          user: null,
+          isAuthenticated: false,
+        }),
+      
+      setLoading: (loading: boolean) =>
+        set({
+          isLoading: loading,
+        }),
+      
+      checkAuthExpiration: () => {
+        const state = get();
+        if (!state.user || !state.user.expires_in) {
+          return false;
+        }
+        
+        const isExpired = Date.now() > state.user.expires_in;
+        
+        if (isExpired) {
+          // Auto logout si el token expiró
+          set({
+            user: null,
+            isAuthenticated: false,
+          });
+        }
+        
+        return !isExpired;
+      },
     }),
-  setLoading: (loading: boolean) =>
-    set({
-      isLoading: loading,
-    }),
-}));
+    {
+      name: "auth-storage", // nombre de la clave en AsyncStorage
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        // Solo persistir estos campos
+        // user: state.user,
+        idUsuario: state.user?.idUsuario,
+        isAuthenticated: state.isAuthenticated,
+        expires_in: state.user?.expires_in,
+      }),
+      onRehydrateStorage: () => (state) => {
+        // Verificar expiración al cargar desde localStorage
+        if (state) {
+          state.checkAuthExpiration();
+        }
+      },
+    }
+  )
+);
 
 export default useAuthStore;
+
+// Hook personalizado para usar la autenticación con verificación automática
+export const useAuth = () => {
+  const auth = useAuthStore();
+  
+  // Verificar expiración cada vez que se accede al hook
+  React.useEffect(() => {
+    auth.checkAuthExpiration();
+  }, [auth]);
+  
+  return auth;
+};

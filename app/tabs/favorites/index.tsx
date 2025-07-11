@@ -48,13 +48,13 @@ const FavoritesScreen = () => {
         </View>
 
         {/* Lista de recetas */}
-        <View className="flex-row flex-wrap justify-between mb-24 px-4">
+        <View className="flex-row flex-wrap justify-between mb-24 px-5">
           {favoritesRecipes.length > 0 ? (
             favoritesRecipes.map((recipe) => (
               <Link
                 href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
                 key={recipe.idReceta}
-                className="mr-2"
+                className="mb-5"
               >
                 <RecipeCard {...recipe} />
               </Link>

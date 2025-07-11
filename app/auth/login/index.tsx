@@ -8,18 +8,15 @@ import {
   View,
 } from "react-native";
 
-import useAuthStore from "@/store/authStore";
+import { useAuth } from "@/store/authStore";
 import type { LoginRequestDTO } from "@/utils/api/usuarios";
 import { login as loginApi } from "@/utils/api/usuarios"; // login API
 import { isValidEmail } from "@/utils/emailValidator";
 
 const AuthScreen = () => {
-  const { login } = useAuthStore(); // login del store para guardar usuario
-  const [mail, setEmail] = useState("");              // queda pero no usado, ok
+  const { login } = useAuth(); // login del store para guardar usuario
   const [aliasOEmail, setAliasOEmail] = useState("");
   const [contrasena, setContraseña] = useState("");
-  const [password, setPassword] = useState("");        // queda pero no usado, ok
-  const [step, setStep] = useState(0);                  // queda pero no usado, ok
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
