@@ -51,6 +51,11 @@ export const RecipeCard = ({
     "https://i.imgur.com/SmMtt1x.png"; // fallback por si no hay imagen
 
   const handleBookmark = async () => {
+    if (!user?.idUsuario) {
+      console.error("Usuario no autenticado");
+      return;
+    }
+
     try {
       if (isBookmarked) {
         await quitarRecetaDeFavoritos(user.idUsuario, idReceta);
@@ -83,7 +88,7 @@ export const RecipeCard = ({
 
   return (
     <View
-      className="mb-4 bg-white rounded-xl shadow-sm"
+      className="mb-4 bg-white rounded-xl border border-gray-200"
       style={{ width: cardWidth }}
     >
       <View className="relative">
@@ -95,7 +100,7 @@ export const RecipeCard = ({
 
         {/* Botón de guardar */}
         <TouchableOpacity
-          className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full items-center justify-center shadow-sm"
+          className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full items-center justify-center"
           onPress={handleBookmark}
           activeOpacity={0.7}
         >

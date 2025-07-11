@@ -23,12 +23,12 @@ export interface CompletarRegistroDTO {
 export interface LoginResponseDTO {
   idUsuario: number;
   alias: string;
+  apellido: string;
+  contrasena?: string;
   email: string;
-  tipoUsuario: string;
   estadoRegistro: string;
   nombre: string;
-  apellido: string;
-  contrasena: string;
+  tipoUsuario: string;
 }
 
 export interface Usuario {

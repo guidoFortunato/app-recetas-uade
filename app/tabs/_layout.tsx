@@ -16,10 +16,7 @@ const TabsLayout = () => {
         const recetasUsuario = await obtenerRecetasIntentarPorUsuario(
           user.idUsuario
         );
-        console.log(
-          "recetasUsuario",
-          recetasUsuario.map((receta) => receta.titulo)
-        );
+        
         handleFavoritesRecipes(recetasUsuario);
       } catch (error) {
         console.log("error", error);

@@ -117,7 +117,7 @@ const UserProfileScreen = () => {
         <View className="px-4 mb-6 mt-2">
           <View className="flex-row items-center justify-between">
             <Text className="text-2xl font-bold text-gray-800">
-              {user.alias}
+              {user?.alias}
             </Text>
             <View className="flex-row items-center">
               <Ionicons name="star" size={18} color="#FFD700" />
@@ -160,7 +160,7 @@ const UserProfileScreen = () => {
                 <Link
                   href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
                   key={recipe.idReceta}
-                  className="mr-2"
+                  className="mb-5"
                 >
                   <RecipeCard
                     icon="open-outline"

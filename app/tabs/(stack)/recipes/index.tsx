@@ -1,5 +1,10 @@
 import { RecipeCard } from "@/components/recipes/RecipeCard";
-import { EstadoReceta, obtenerPorEstadoYVisibilidad, RecetaRespuestaDTO } from "@/utils/api/recetas";
+import {
+  EstadoReceta,
+  obtenerPorEstadoYVisibilidad,
+  RecetaRespuestaDTO,
+} from "@/utils/api/recetas";
+import { Link } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 
@@ -12,7 +17,10 @@ const RecipesScreen = () => {
     const cargarRecetas = async () => {
       try {
         setLoading(true);
-        const data = await obtenerPorEstadoYVisibilidad(EstadoReceta.aprobada, true);
+        const data = await obtenerPorEstadoYVisibilidad(
+          EstadoReceta.aprobada,
+          true
+        );
         setRecetas(data);
         setError(null);
       } catch (err) {
@@ -25,19 +33,31 @@ const RecipesScreen = () => {
     cargarRecetas();
   }, []);
 
+  // console.log({ recetas });
+
   return (
     <ScrollView>
       {loading && <Text>Cargando recetas...</Text>}
       {error && <Text style={{ color: "red" }}>{error}</Text>}
-      {!loading && !error && recetas.length === 0 && <Text>No hay recetas disponibles.</Text>}
-      <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
+      {!loading && !error && recetas.length === 0 && (
+        <Text>No hay recetas disponibles.</Text>
+      )}
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+        }}
+        className="px-5"
+      >
         {recetas.map((recipe) => (
-          <RecipeCard
+          <Link
+            href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
             key={recipe.idReceta}
-            {...recipe}
-            icon="open-outline"
-            iconFill="open"
-          />
+            className="mb-5"
+          >
+            <RecipeCard key={recipe.idReceta} {...recipe} />
+          </Link>
         ))}
       </View>
     </ScrollView>

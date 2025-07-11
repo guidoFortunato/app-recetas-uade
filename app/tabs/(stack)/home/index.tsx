@@ -13,6 +13,7 @@ import {
   View
 } from "react-native";
 
+import { useAuth } from "@/store/authStore";
 import { CategoriaReceta as CategoriaRecetaDTO, obtenerCategorias } from "@/utils/api/categoriaRecetas";
 import { EstadoReceta, obtenerPorEstadoYVisibilidad, RecetaRespuestaDTO } from "@/utils/api/recetas";
 
@@ -23,6 +24,9 @@ const HomeScreen = () => {
   const [recetasSugeridas, setRecetasSugeridas] = useState<RecetaRespuestaDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { user } = useAuth();
+  console.log({user});
 
   // Estado para categorías
   const [categories, setCategories] = useState<{ name: string, image: string }[]>([]);
