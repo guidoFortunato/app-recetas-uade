@@ -1,5 +1,6 @@
+import useAuthStore from "@/store/authStore";
 import useProductsStore from "@/store/productsStore";
-import { obtenerRecetaPorId, obtenerValoracionesAprobadasPorReceta, RecetaRespuestaDTO, ValoracionRecetaDTO } from "@/utils/api/recetas";
+import { EnviarValoracionRecetaDTO, obtenerRecetaPorId, obtenerValoracionesAprobadasPorReceta, RecetaRespuestaDTO, ValoracionRecetaDTO, valorarReceta } from "@/utils/api/recetas";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -14,7 +15,9 @@ import {
   View,
 } from "react-native";
 
+
 const RecipeDetailScreen = () => {
+  const { user} = useAuthStore();
   const { id } = useLocalSearchParams();
   const navigation = useNavigation();
 
@@ -28,7 +31,6 @@ const RecipeDetailScreen = () => {
   const { removeFromFavorites, addToFavorites, favoritesRecipes } = useProductsStore();
 
   // Estados para reseñas (se mantienen igual)
-  const [reviewTitle, setReviewTitle] = useState("");
   const [reviewDescription, setReviewDescription] = useState("");
   const [userRating, setUserRating] = useState(0);
   const [valoraciones, setValoraciones] = useState<ValoracionRecetaDTO[]>([]);
@@ -148,9 +150,6 @@ const RecipeDetailScreen = () => {
     return (
       <View className="mb-6 p-4 bg-gray-50 rounded-lg">
         {renderStars(review.rating)}
-        <Text className="text-lg font-bold text-gray-800 mt-2 mb-2">
-          {review.title}
-        </Text>
         <Text className="text-sm text-gray-600 leading-5 mb-3">
           {review.description}
         </Text>
@@ -177,17 +176,38 @@ const RecipeDetailScreen = () => {
     );
   };
 
-  const handleSubmitReview = () => {
-    if (!reviewTitle || !reviewDescription || userRating === 0) {
-      alert("Por favor completa todos los campos");
-      return;
-    }
+const handleSubmitReview = async () => {
+  if (!reviewDescription || userRating === 0) {
+    alert("Por favor completa todos los campos");
+    return;
+  }
 
-    alert("Reseña enviada (mock)");
-    setReviewTitle("");
+  if (!recipe) return;
+
+  const dto: EnviarValoracionRecetaDTO = {
+    idUsuario: user?.idUsuario, // O reemplazar por el usuario autenticado real
+    puntaje: userRating,
+    comentario: reviewDescription,
+  };
+
+  try {
+    console.log(user)
+    console.log(dto.idUsuario);
+    await valorarReceta(recipe.idReceta, dto);
+    alert("Reseña enviada correctamente");
+
+    // Limpiar campos
     setReviewDescription("");
     setUserRating(0);
-  };
+
+    // Recargar valoraciones
+    const nuevasValoraciones = await obtenerValoracionesAprobadasPorReceta(recipe.idReceta);
+    setValoraciones(nuevasValoraciones);
+  } catch (e) {
+    console.error("Error al enviar valoración", e);
+    alert("Ocurrió un error al enviar la reseña");
+  }
+};
 
   return (
     <View className="flex-1 bg-white">
@@ -308,17 +328,6 @@ const RecipeDetailScreen = () => {
             <Text className="text-lg font-bold text-gray-800 mb-4">
               Agregar Reseña
             </Text>
-
-            <View className="mb-4">
-              <Text className="text-gray-800 font-medium mb-2">Título</Text>
-              <TextInput
-                value={reviewTitle}
-                onChangeText={setReviewTitle}
-                placeholder="Título de tu reseña..."
-                className="border border-gray-300 rounded-lg px-3 py-3 text-gray-700"
-                placeholderTextColor="#9CA3AF"
-              />
-            </View>
 
             <View className="mb-4">
               <Text className="text-gray-800 font-medium mb-2">Descripción</Text>
