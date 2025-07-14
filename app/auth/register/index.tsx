@@ -113,6 +113,7 @@ const RegisterScreen = () => {
         router.replace("/auth/login");
       }
     } catch (error: any) {
+      console.log({error});
       if (error.response?.status === 409 && error.response.data) {
         alert(error.response.data); // "El alias ya está en uso" o "El email ya está en uso"
       } else {

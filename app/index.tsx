@@ -10,6 +10,8 @@ const RecetasApp = () => {
   const { setUser, user } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
+  console.log({user});
+
   useEffect(() => {
     const loadAuth = async () => {
       try {
@@ -20,8 +22,12 @@ const RecetasApp = () => {
         }
         const parsed = JSON.parse(stored);
         const data = parsed?.state;
-
-        if (!data?.isAuthenticated || !data?.idUsuario) {
+        const expiresIn = data?.expires_in;
+        const isExpired = Date.now() > expiresIn;
+        const idUsuario = data?.idUsuario;
+        const isAuthenticated = data?.isAuthenticated;
+        console.log({isExpired, idUsuario, isAuthenticated});
+        if (!isAuthenticated || !idUsuario || isExpired) {
           setLoading(false);
           return;
         }
