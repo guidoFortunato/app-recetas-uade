@@ -1,14 +1,13 @@
-
 import { CategoriaReceta } from "@/utils/api/categoriaRecetas";
+import axios from "axios";
 
 //const API_URL = "https://api-recetas-render.onrender.com/recetas";
 //const INGREDIENTES_API_URL = "https://api-recetas-render.onrender.com/ingredientes";
 const API_URL = "http://10.0.2.2:8080/recetas";
 const INGREDIENTES_API_URL = "http://10.0.2.2:8080/ingredientes";
 
-
 export enum TipoMultimedia {
-  imagen = "imagen",
+  imagen = "foto",
   video = "video",
 }
 
@@ -108,154 +107,234 @@ export interface EnviarValoracionRecetaDTO {
   comentario: string;
 }
 
-// Funciones principales
-export async function crearReceta(dto: CrearRecetaDTO) {
-  const res = await fetch(`${API_URL}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dto),
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.text();
-}
+// Funciones principales usando axios y manejo de errores estilo Promise
 
-export async function obtenerRecetas(): Promise<RecetaRespuestaDTO[]> {
-  const res = await fetch(`${API_URL}`);
-  if (!res.ok) throw new Error("Error obteniendo recetas");
-  return res.json();
-}
+export const crearReceta = (dto: CrearRecetaDTO): Promise<string> =>
+  axios
+    .post(`${API_URL}`, dto)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerRecetaPorId(id: number): Promise<RecetaRespuestaDTO> {
-  const res = await fetch(`${API_URL}/${id}`);
-  if (!res.ok) throw new Error("Receta no encontrada");
-  return res.json();
-}
+export const obtenerRecetas = (): Promise<RecetaRespuestaDTO[]> =>
+  axios
+    .get(`${API_URL}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function actualizarReceta(id: number, dto: ModificarRecetaDTO) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dto),
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.text();
-}
+export const obtenerRecetaPorId = (id: number): Promise<RecetaRespuestaDTO> =>
+  axios
+    .get(`${API_URL}/${id}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function eliminarReceta(id: number) {
-  const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-  if (!res.ok) throw new Error("Error eliminando receta");
-}
+export const actualizarReceta = (
+  id: number,
+  dto: ModificarRecetaDTO
+): Promise<string> =>
+  axios
+    .put(`${API_URL}/${id}`, dto)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function cambiarVisibilidad(id: number) {
-  const res = await fetch(`${API_URL}/${id}/visibilidad`, { method: "PUT" });
-  if (!res.ok) throw new Error(await res.text());
-  return res.text();
-}
+export const eliminarReceta = (id: number): Promise<void> =>
+  axios
+    .delete(`${API_URL}/${id}`)
+    .then(() => {})
+    .catch((error) => {
+      throw error;
+    });
 
-export async function valorarReceta(id: number, dto: EnviarValoracionRecetaDTO) {
-  const res = await fetch(`${API_URL}/${id}/valorar`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dto),
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.text();
-}
+export const cambiarVisibilidad = (id: number): Promise<string> =>
+  axios
+    .put(`${API_URL}/${id}/visibilidad`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-// NUEVA FUNCIÓN: busca ingrediente por nombre
-export async function obtenerIngredientePorNombre(nombre: string): Promise<IngredienteDTO> {
-  const res = await fetch(`${INGREDIENTES_API_URL}/nombre/${encodeURIComponent(nombre)}`);
-  if (!res.ok) throw new Error("Ingrediente no encontrado");
-  return res.json();
-}
+export const valorarReceta = (
+  id: number,
+  dto: EnviarValoracionRecetaDTO
+): Promise<string> =>
+  axios
+    .post(`${API_URL}/${id}/valorar`, dto)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-// MODIFICADAS: ahora buscan recetas por nombre de ingrediente
-export async function obtenerRecetasPorIngrediente(nombreIngrediente: string): Promise<RecetaRespuestaDTO[]> {
-  const ingrediente = await obtenerIngredientePorNombre(nombreIngrediente);
-  const res = await fetch(`${API_URL}/ingrediente/${ingrediente.idIngrediente}`);
-  if (!res.ok) throw new Error("Error al obtener recetas por ingrediente");
-  return res.json();
-}
+// Ingredientes
+export const obtenerIngredientePorNombre = (
+  nombre: string
+): Promise<IngredienteDTO> =>
+  axios
+    .get(`${INGREDIENTES_API_URL}/nombre/${encodeURIComponent(nombre)}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerRecetasPorNoIngrediente(nombreIngrediente: string): Promise<RecetaRespuestaDTO[]> {
-  const ingrediente = await obtenerIngredientePorNombre(nombreIngrediente);
-  const res = await fetch(`${API_URL}/ingrediente/${ingrediente.idIngrediente}/sin`);
-  if (!res.ok) throw new Error("Error al obtener recetas sin ingrediente");
-  return res.json();
-}
+// Recetas por ingrediente
+export const obtenerRecetasPorIngrediente = (
+  nombreIngrediente: string
+): Promise<RecetaRespuestaDTO[]> =>
+  obtenerIngredientePorNombre(nombreIngrediente)
+    .then((ingrediente) =>
+      axios
+        .get(`${API_URL}/ingrediente/${ingrediente.idIngrediente}`)
+        .then((res) => res.data)
+    )
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerRecetasIntentarPorUsuario(idUsuario: number): Promise<RecetaRespuestaDTO[]> {
-  const res = await fetch(`${API_URL}/lista-recetas-intentar/${idUsuario}`);
-  if (!res.ok) throw new Error("Error al obtener recetas guardadas");
-  return res.json();
-}
+export const obtenerRecetasPorNoIngrediente = (
+  nombreIngrediente: string
+): Promise<RecetaRespuestaDTO[]> =>
+  obtenerIngredientePorNombre(nombreIngrediente)
+    .then((ingrediente) =>
+      axios
+        .get(`${API_URL}/ingrediente/${ingrediente.idIngrediente}/sin`)
+        .then((res) => res.data)
+    )
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerRecetasPorUsuario(idUsuario: number): Promise<RecetaRespuestaDTO[]> {
-  const res = await fetch(`${API_URL}/usuario/${idUsuario}`);
-  if (!res.ok) throw new Error("Error al obtener recetas del usuario");
-  return res.json();
-}
+// Recetas listas para intentar
+export const obtenerRecetasIntentarPorUsuario = (
+  idUsuario: number
+): Promise<RecetaRespuestaDTO[]> =>
+  axios
+    .get(`${API_URL}/lista-recetas-intentar/${idUsuario}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerRecetasPorAliasUsuario(alias: string): Promise<RecetaRespuestaDTO[]> {
-  const res = await fetch(`${API_URL}/usuario/alias/${encodeURIComponent(alias)}`);
-  if (!res.ok) throw new Error("Error al obtener recetas por alias");
-  return res.json();
-}
+// Recetas por usuario
+export const obtenerRecetasPorUsuario = (
+  idUsuario: number
+): Promise<RecetaRespuestaDTO[]> =>
+  axios
+    .get(`${API_URL}/usuario/${idUsuario}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerRecetasPorTitulo(titulo: string): Promise<RecetaRespuestaDTO[]> {
-  const res = await fetch(`${API_URL}/buscar?titulo=${encodeURIComponent(titulo)}`);
-  if (!res.ok) throw new Error("Error al buscar recetas por título");
-  return res.json();
-}
+export const obtenerRecetasPorAliasUsuario = (
+  alias: string
+): Promise<RecetaRespuestaDTO[]> =>
+  axios
+    .get(`${API_URL}/usuario/alias/${encodeURIComponent(alias)}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerRecetasPorCategoria(categoria: string | CategoriaReceta): Promise<RecetaRespuestaDTO[]> {
-  const res = await fetch(`${API_URL}/categoria/${categoria}`);
-  if (!res.ok) throw new Error("Error al obtener recetas por categoría");
-  return res.json();
-}
+// Recetas por título
+export const obtenerRecetasPorTitulo = (
+  titulo: string
+): Promise<RecetaRespuestaDTO[]> =>
+  axios
+    .get(`${API_URL}/buscar?titulo=${encodeURIComponent(titulo)}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerPorEstadoYVisibilidad(estado: EstadoReceta, publico: boolean): Promise<RecetaRespuestaDTO[]> {
-  const res = await fetch(`${API_URL}/estado-visibilidad/${estado}/${publico}`);
-  if (!res.ok) throw new Error("Error al obtener recetas por estado y visibilidad");
-  return res.json();
-}
+// Recetas por categoría
+export const obtenerRecetasPorCategoria = (
+  categoria: string | CategoriaReceta
+): Promise<RecetaRespuestaDTO[]> =>
+  axios
+    .get(`${API_URL}/categoria/${categoria}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerPorEstado(estado: EstadoReceta): Promise<RecetaRespuestaDTO[]> {
-  const res = await fetch(`${API_URL}/estado/${estado}`);
-  if (!res.ok) throw new Error("Error al obtener recetas por estado");
-  return res.json();
-}
+// Por estado y visibilidad
+export const obtenerPorEstadoYVisibilidad = (
+  estado: EstadoReceta,
+  publico: boolean
+): Promise<RecetaRespuestaDTO[]> =>
+  axios
+    .get(`${API_URL}/estado-visibilidad/${estado}/${publico}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerPorVisibilidad(publico: boolean): Promise<RecetaRespuestaDTO[]> {
-  const res = await fetch(`${API_URL}/visibilidad/${publico}`);
-  if (!res.ok) throw new Error("Error al obtener recetas por visibilidad");
-  return res.json();
-}
+export const obtenerPorEstado = (estado: EstadoReceta): Promise<RecetaRespuestaDTO[]> =>
+  axios
+    .get(`${API_URL}/estado/${estado}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerValoracionesRecetaEstado(idReceta: number, estado: EstadoValoracion): Promise<ValoracionRecetaDTO[]> {
-  const res = await fetch(`${API_URL}/${idReceta}/valoraciones/estado/${estado}`);
-  if (!res.ok) throw new Error("Error al obtener valoraciones de la receta por estado");
-  return res.json();
-}
+export const obtenerPorVisibilidad = (publico: boolean): Promise<RecetaRespuestaDTO[]> =>
+  axios
+    .get(`${API_URL}/visibilidad/${publico}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerRecetasOrdenadas(
+export const obtenerValoracionesRecetaEstado = (
+  idReceta: number,
+  estado: EstadoValoracion
+): Promise<ValoracionRecetaDTO[]> =>
+  axios
+    .get(`${API_URL}/${idReceta}/valoraciones/estado/${estado}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
+
+export const obtenerRecetasOrdenadas = (
   estado: EstadoReceta,
   publico: boolean,
   criterio: string = "fecha"
-): Promise<RecetaRespuestaDTO[]> {
-  const res = await fetch(`${API_URL}/ordenadas?estado=${estado}&publico=${publico}&criterio=${encodeURIComponent(criterio)}`);
-  if (!res.ok) throw new Error("Error al obtener recetas ordenadas");
-  return res.json();
-}
+): Promise<RecetaRespuestaDTO[]> =>
+  axios
+    .get(
+      `${API_URL}/ordenadas?estado=${estado}&publico=${publico}&criterio=${encodeURIComponent(
+        criterio
+      )}`
+    )
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function existeRecetaUsuario(idUsuario: number, titulo: string): Promise<boolean> {
-  const res = await fetch(`${API_URL}/existe?idUsuario=${idUsuario}&titulo=${encodeURIComponent(titulo)}`);
-  if (!res.ok) throw new Error("Error al verificar existencia de receta");
-  return res.json();
-}
+export const existeRecetaUsuario = (
+  idUsuario: number,
+  titulo: string
+): Promise<boolean> =>
+  axios
+    .get(`${API_URL}/existe?idUsuario=${idUsuario}&titulo=${encodeURIComponent(titulo)}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
 
-export async function obtenerValoracionesAprobadasPorReceta(idReceta: number): Promise<ValoracionRecetaDTO[]> {
-  const res = await fetch(`${API_URL}/${idReceta}/valoraciones`);
-  if (!res.ok) throw new Error("Error al obtener valoraciones aprobadas");
-  return res.json();
-}
+export const obtenerValoracionesAprobadasPorReceta = (
+  idReceta: number
+): Promise<ValoracionRecetaDTO[]> =>
+  axios
+    .get(`${API_URL}/${idReceta}/valoraciones`)
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
