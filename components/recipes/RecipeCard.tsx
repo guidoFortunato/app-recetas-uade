@@ -1,13 +1,13 @@
 import useAuthStore from "@/store/authStore";
 import useProductsStore from "@/store/productsStore";
-import { type RecetaRespuestaDTO } from "@/utils/api/recetas";
+import { eliminarReceta, type RecetaRespuestaDTO } from "@/utils/api/recetas";
 import {
   agregarRecetasFavoritas,
   quitarRecetaDeFavoritos,
 } from "@/utils/api/usuarios";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 
 const { width } = Dimensions.get("window");
 const cardWidth = (width - 48) / 2;
@@ -15,6 +15,7 @@ const cardWidth = (width - 48) / 2;
 interface Props extends RecetaRespuestaDTO {
   icon?: "bookmark-outline" | "open-outline";
   iconFill?: "bookmark" | "open";
+  isInProfile?: boolean;
 }
 
 export const RecipeCard = ({
@@ -31,10 +32,11 @@ export const RecipeCard = ({
   fechaCreacion,
   icon = "bookmark-outline",
   iconFill = "bookmark",
+  isInProfile = false,
 }: Props) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  const { removeFromFavorites, addToFavorites, favoritesRecipes } =
+  const { removeFromFavorites, addToFavorites, favoritesRecipes, deleteUserRecipe } =
     useProductsStore();
   const { user } = useAuthStore();
 
@@ -86,6 +88,19 @@ export const RecipeCard = ({
     }
   };
 
+  const handleDelete = () => {
+    Alert.alert("¿Estás seguro de que quieres eliminar esta receta?", "", [
+      {
+        text: "Cancelar",
+        style: "cancel",
+      },
+      { text: "Eliminar", onPress: () => {
+        eliminarReceta(idReceta);
+        deleteUserRecipe(idReceta);
+      } },
+    ]);
+  };
+
   return (
     <View
       className="mb-4 bg-white rounded-xl border border-gray-200"
@@ -97,9 +112,48 @@ export const RecipeCard = ({
           className="w-full h-32 rounded-t-xl"
           resizeMode="cover"
         />
+        {/* Botón de guardar */}
+        {!isInProfile ? (
+          <TouchableOpacity
+            className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full items-center justify-center"
+            onPress={handleBookmark}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name={isBookmarked ? iconFill : icon}
+              size={16}
+              color={isBookmarked ? "#000" : "#666"}
+            />
+          </TouchableOpacity>
+        ) : (
+          <View className="absolute top-2 right-2 flex-row gap-1">
+            <TouchableOpacity
+              className="w-8 h-8 bg-white rounded-full items-center justify-center"
+              onPress={() => alert("Botón de compartir")}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="open-outline"
+                size={16}
+                color="#000"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="w-8 h-8 bg-white rounded-full items-center justify-center"
+              onPress={handleDelete}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="trash-outline"
+                size={16}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Botón de guardar */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full items-center justify-center"
           onPress={handleBookmark}
           activeOpacity={0.7}
@@ -109,7 +163,7 @@ export const RecipeCard = ({
             size={16}
             color={isBookmarked ? "#000" : "#666"}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <View className="p-3">
