@@ -109,7 +109,7 @@ const RecipeDetailScreen = () => {
     );
   }
 
-  const imagenReceta = recipe.multimedia.find((m) => m.tipo === "imagen")?.url;
+  const imagenReceta = recipe.multimedia.find((m) => m.tipo === "foto")?.url;
 
   const calcularTiempo = (fechaISO: string) => {
     const diffDias = Math.floor((Date.now() - new Date(fechaISO).getTime()) / (1000 * 60 * 60 * 24));
@@ -185,7 +185,7 @@ const handleSubmitReview = async () => {
   if (!recipe) return;
 
   const dto: EnviarValoracionRecetaDTO = {
-    idUsuario: user?.idUsuario, // O reemplazar por el usuario autenticado real
+    idUsuario: user!.idUsuario,
     puntaje: userRating,
     comentario: reviewDescription,
   };

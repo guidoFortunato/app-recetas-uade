@@ -1,4 +1,3 @@
-import { Link, router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -11,18 +10,18 @@ import {
   View,
 } from "react-native";
 
-
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import useAuthStore from "@/store/authStore";
-import { Ionicons } from "@expo/vector-icons";
-
 import { obtenerRecetasPorUsuario, RecetaRespuestaDTO } from "@/utils/api/recetas";
 
 const UserProfileScreen = () => {
   const { user, logout } = useAuthStore();
+  const router = useRouter();
+
   const [avatarError, setAvatarError] = useState(false);
-  // console.dir({user}, {depth: null});
 
   // Estado para recetas
   const [recetas, setRecetas] = useState<RecetaRespuestaDTO[]>([]);
@@ -116,14 +115,10 @@ const UserProfileScreen = () => {
         {/* User Info */}
         <View className="px-4 mb-6 mt-2">
           <View className="flex-row items-center justify-between">
-            <Text className="text-2xl font-bold text-gray-800">
-              {user?.alias}
-            </Text>
+            <Text className="text-2xl font-bold text-gray-800">{user?.alias}</Text>
             <View className="flex-row items-center">
               <Ionicons name="star" size={18} color="#FFD700" />
-              <Text className="text-lg font-semibold text-gray-800 ml-1">
-                9.0
-              </Text>
+              <Text className="text-lg font-semibold text-gray-800 ml-1">9.0</Text>
             </View>
           </View>
         </View>
@@ -148,27 +143,27 @@ const UserProfileScreen = () => {
           {/* Recipes Grid */}
           <View className="flex-row flex-wrap justify-between mb-24">
             {loadingRecetas && <Text>Cargando recetas...</Text>}
-            {errorRecetas && (
-              <Text className="text-red-600">{errorRecetas}</Text>
-            )}
+            {errorRecetas && <Text className="text-red-600">{errorRecetas}</Text>}
             {!loadingRecetas && !errorRecetas && recetas.length === 0 && (
               <Text>No tienes recetas todavía.</Text>
             )}
             {!loadingRecetas &&
               !errorRecetas &&
               recetas.map((recipe) => (
-                <Link
-                  href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
+                <TouchableOpacity
                   key={recipe.idReceta}
                   className="mb-5"
+                  activeOpacity={0.8}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/tabs/recipes/[id]",
+                      params: { id: recipe.idReceta.toString() },
+                    })
+                  }
                 >
-                  <RecipeCard
-                    icon="open-outline"
-                    iconFill="open"
-                    {...recipe}
-                  />
-                </Link>
-            ))}
+                  <RecipeCard icon="open-outline" iconFill="open" {...recipe} />
+                </TouchableOpacity>
+              ))}
           </View>
         </View>
       </ScrollView>

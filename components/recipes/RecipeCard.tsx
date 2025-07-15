@@ -47,7 +47,7 @@ export const RecipeCard = ({
   }, [favoritesRecipes, idReceta]);
 
   const imageUrl =
-    multimedia?.find((m) => m.tipo === "imagen")?.url ??
+    multimedia?.find((m) => m.tipo === "foto")?.url ??
     "https://i.imgur.com/SmMtt1x.png"; // fallback por si no hay imagen
 
   const handleBookmark = async () => {
