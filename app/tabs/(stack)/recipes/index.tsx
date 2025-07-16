@@ -33,8 +33,6 @@ const RecipesScreen = () => {
     cargarRecetas();
   }, []);
 
-  // console.log({ recetas });
-
   return (
     <ScrollView>
       {loading && <Text>Cargando recetas...</Text>}

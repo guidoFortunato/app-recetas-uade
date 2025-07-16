@@ -59,6 +59,8 @@ const CreateRecipeScreen = () => {
 
   const [ingredientesDisponibles, setIngredientesDisponibles] = useState<string[]>([]);
 
+  const [esPublica, setEsPublica] = useState(true);
+
   useEffect(() => {
     obtenerCategorias().then((res) => {
       if (res && res.length > 0) {
@@ -216,6 +218,19 @@ const CreateRecipeScreen = () => {
     );
   };
 
+  const resetForm = () => {
+    setRecipeName("");
+    setDescription("");
+    setCantidadPersonas("1");
+    setCategoriaSeleccionada(categorias[0] || "");
+    setImagenUrl(null);
+    setIngredients([
+      { id: Date.now().toString(), quantity: "", unit: "unidad/es", name: "" },
+    ]);
+    setSteps([{ id: "1", description: "", multimediaUrls: [] }]);
+  };
+
+
   const handleCrearReceta = async () => {
     if (!recipeName || !description || !imagenUrl) {
       Alert.alert("Campos incompletos", "Completá todos los campos e imagen.");
@@ -228,7 +243,7 @@ const CreateRecipeScreen = () => {
     if (!cantidadPersonas || isNaN(Number(cantidadPersonas)) || Number(cantidadPersonas) <= 0) {
        Alert.alert("Cantidad de personas inválida", "Ingresá un número válido de personas.");
       return;
-}
+    }
 
     for (const ing of ingredients) {
       if (!ing.name || !ing.quantity || !ing.unit) {
@@ -257,7 +272,7 @@ const CreateRecipeScreen = () => {
         titulo: recipeName,
         descripcion: description,
         cantidadPersonas: parseInt(cantidadPersonas),
-        publico: true,
+        publico: esPublica,
         categoria: categoriaSeleccionada,
         ingredientes: ingredients.map((ing) => ({
           nombre: ing.name,
@@ -280,9 +295,8 @@ const CreateRecipeScreen = () => {
         ],
       };
 
-      console.log(dto);
-      console.log("DTO enviado:", JSON.stringify(dto, null, 2));
       await crearReceta(dto);
+      resetForm();
       Alert.alert("Éxito", "Receta creada con éxito");
     } catch (error) {
       console.error("Error al crear receta:", error);
@@ -352,6 +366,21 @@ const CreateRecipeScreen = () => {
               placeholderTextColor="#9CA3AF"
               textAlignVertical="top"
             />
+          </View>
+
+          {/* Visibilidad */}
+          <View className="mb-6">
+            <Text className="text-gray-800 font-medium mb-2">Visibilidad</Text>
+            <TouchableOpacity
+              onPress={() => setEsPublica((prev) => !prev)}
+              className={`px-4 py-2 rounded-lg ${
+                esPublica ? "bg-green-100" : "bg-gray-200"
+              }`}
+            >
+              <Text className="text-gray-800 font-medium">
+                {esPublica ? "Pública" : "Privada"}
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {/* Cantidad de personas */}

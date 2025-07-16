@@ -11,10 +11,10 @@ import {
 } from "react-native";
 
 
-
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import useAuthStore from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
+import { Link, useRouter } from "expo-router";
 
 import useProductsStore from "@/store/productsStore";
 import { obtenerRecetasPorUsuario, RecetaRespuestaDTO } from "@/utils/api/recetas";
