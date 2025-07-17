@@ -6,6 +6,7 @@ import {
   quitarRecetaDeFavoritos,
 } from "@/utils/api/usuarios";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
@@ -43,6 +44,7 @@ export const RecipeCard = ({
   iconFill = "bookmark",
   isInProfile = false,
 }: Props) => {
+  const router = useRouter(); 
   const [isBookmarked, setIsBookmarked] = useState(false);
 
   const {
@@ -139,7 +141,11 @@ export const RecipeCard = ({
           <View className="absolute top-2 right-2 flex-row gap-1">
             <TouchableOpacity
               className="w-8 h-8 bg-white rounded-full items-center justify-center"
-              onPress={() => alert("Botón de compartir")}
+              onPress={() =>
+                router.push(
+                  `/tabs/profile/(stack)/recipes/${idReceta}/modificar`
+                )
+              }
               activeOpacity={0.7}
             >
               <Ionicons name="open-outline" size={16} color="#000" />
