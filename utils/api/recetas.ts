@@ -338,3 +338,17 @@ export const obtenerValoracionesAprobadasPorReceta = (
     .catch((error) => {
       throw error;
     });
+
+export const multiplicarIngredientesReceta = (
+  idReceta: number,
+  cantPersonas: number
+): Promise<IngredienteRecetaDTO[]> =>
+  axios
+    .get(`${API_URL}/${idReceta}/ingredientes/multiplicar`, {
+      params: { cantPersonas },
+    })
+    .then((res) => res.data)
+    .catch((error) => {
+      throw error;
+    });
+
