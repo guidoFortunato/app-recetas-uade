@@ -10,14 +10,13 @@ import {
   View,
 } from "react-native";
 
-
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import useAuthStore from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 
 import useProductsStore from "@/store/productsStore";
-import { obtenerRecetasPorUsuario, RecetaRespuestaDTO } from "@/utils/api/recetas";
+import { obtenerRecetasPorUsuario } from "@/utils/api/recetas";
 
 const UserProfileScreen = () => {
   const { user, logout } = useAuthStore();
@@ -25,9 +24,7 @@ const UserProfileScreen = () => {
 
   const [avatarError, setAvatarError] = useState(false);
 
-  // Estado para recetas
   const { handleUserRecipes, userRecipes } = useProductsStore();
-  const [recetas, setRecetas] = useState<RecetaRespuestaDTO[]>([]);
   const [loadingRecetas, setLoadingRecetas] = useState(false);
   const [errorRecetas, setErrorRecetas] = useState<string | null>(null);
 
@@ -38,7 +35,6 @@ const UserProfileScreen = () => {
       try {
         setLoadingRecetas(true);
         const recetasUsuario = await obtenerRecetasPorUsuario(user.idUsuario);
-        // setRecetas(recetasUsuario);
         handleUserRecipes(recetasUsuario);
         setErrorRecetas(null);
       } catch (error) {
@@ -98,7 +94,7 @@ const UserProfileScreen = () => {
               <View className="flex-row items-center justify-center">
                 <Image
                   source={{
-                    uri: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.mos.cms.futurecdn.net%2FQiBMZTjEuDquSpLTJYvwxZ.jpg&f=1&nofb=1&ipt=7e24067fd457cbf8e177b4a2cb50e8a742d6f03c896769dea5982335285ba24b",
+                    uri: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.mos.cms.futurecdn.net%2FQiBMZTjEuDquSpLTJYvwxZ.jpg&f=1&nofb=1",
                   }}
                   className="w-20 h-20 rounded-full"
                   onError={() => setAvatarError(true)}
@@ -124,10 +120,6 @@ const UserProfileScreen = () => {
         <View className="px-4 mb-6 mt-2">
           <View className="flex-row items-center justify-between">
             <Text className="text-2xl font-bold text-gray-800">{user?.alias}</Text>
-            <View className="flex-row items-center">
-              <Ionicons name="star" size={18} color="#FFD700" />
-              <Text className="text-lg font-semibold text-gray-800 ml-1">9.0</Text>
-            </View>
           </View>
         </View>
 
@@ -135,25 +127,12 @@ const UserProfileScreen = () => {
         <View className="px-4">
           <View className="flex-row items-center justify-between mb-4">
             <Text className="text-lg font-bold text-gray-800">Tus Recetas</Text>
-            <View className="flex-row">
-              <TouchableOpacity className="flex-row items-center mr-4">
-                <Text className="text-gray-700 mr-1">Filtrar</Text>
-                <Ionicons name="chevron-down-outline" size={16} color="#666" />
-              </TouchableOpacity>
-
-              <TouchableOpacity className="flex-row items-center">
-                <Text className="text-gray-700 mr-1">Ordenar</Text>
-                <Ionicons name="chevron-down-outline" size={16} color="#666" />
-              </TouchableOpacity>
-            </View>
           </View>
 
           {/* Recipes Grid */}
           <View className="flex-row flex-wrap justify-between mb-24">
             {loadingRecetas && <Text>Cargando recetas...</Text>}
-            {errorRecetas && (
-              <Text className="text-red-600">{errorRecetas}</Text>
-            )}
+            {errorRecetas && <Text className="text-red-600">{errorRecetas}</Text>}
             {!loadingRecetas && !errorRecetas && userRecipes.length === 0 && (
               <Text>No tienes recetas todavía.</Text>
             )}
@@ -161,16 +140,16 @@ const UserProfileScreen = () => {
               !errorRecetas &&
               userRecipes.map((recipe) => (
                 <Link
-                  href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
                   key={recipe.idReceta}
+                  href={{
+                    pathname: "/tabs/profile/(stack)/recipes/[id]/usuario",
+                    params: { id: recipe.idReceta.toString() },
+                  }}
                   className="mb-5"
                 >
-                  <RecipeCard
-                    isInProfile
-                    {...recipe}
-                  />
+                  <RecipeCard isInProfile {...recipe} />
                 </Link>
-            ))}
+              ))}
           </View>
         </View>
       </ScrollView>
@@ -179,3 +158,4 @@ const UserProfileScreen = () => {
 };
 
 export default UserProfileScreen;
+
