@@ -7,10 +7,18 @@ import {
 } from "@/utils/api/usuarios";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { Alert, Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Dimensions,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const { width } = Dimensions.get("window");
 const cardWidth = (width - 48) / 2;
+const cardHeight = 220; // Altura fija para las cards
 
 interface Props extends RecetaRespuestaDTO {
   icon?: "bookmark-outline" | "open-outline";
@@ -37,8 +45,12 @@ export const RecipeCard = ({
 }: Props) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  const { removeFromFavorites, addToFavorites, favoritesRecipes, deleteUserRecipe } =
-    useProductsStore();
+  const {
+    removeFromFavorites,
+    addToFavorites,
+    favoritesRecipes,
+    deleteUserRecipe,
+  } = useProductsStore();
   const { user } = useAuthStore();
 
   useEffect(() => {
@@ -102,8 +114,8 @@ export const RecipeCard = ({
 
   return (
     <View
-      className="mb-4 bg-white rounded-xl border border-gray-200"
-      style={{ width: cardWidth }}
+      className="mb-4 bg-white rounded-xl border border-gray-200 overflow-hidden"
+      style={{ width: cardWidth, height: cardHeight }}
     >
       <View className="relative">
         <Image
@@ -143,15 +155,24 @@ export const RecipeCard = ({
         )}
       </View>
 
-      <View className="p-3">
-        <Text className="text-xs text-gray-500 mb-1">
-          {usuario?.alias ?? "Desconocido"}
-        </Text>
-        <Text className="text-sm font-semibold text-gray-800 mb-2">
-          {titulo}
-        </Text>
+      <View className="p-3 flex-1 justify-between">
+        <View>
+          <Text
+            className="text-xs text-gray-500 mb-1"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {usuario?.alias ?? "Desconocido"}
+          </Text>
+          <Text
+            className="text-sm font-semibold text-gray-800 mb-2"
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {titulo}
+          </Text>
+        </View>
 
-        {/* Valoración promedio */}
         <View className="flex-row items-center mt-1">
           <Ionicons name="star" size={14} color="#FFD700" />
           <Text className="text-sm font-medium text-gray-700 ml-1">
