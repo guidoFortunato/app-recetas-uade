@@ -1,4 +1,5 @@
 import { RecetaRespuestaDTO } from "@/utils/api/recetas";
+import { Usuario } from "@/utils/api/usuarios";
 import { create } from "zustand";
 
 interface ProductCategory {
@@ -21,7 +22,10 @@ interface ProductsState {
   searchQuery: string;
   favoritesRecipes: RecetaRespuestaDTO[];
   userRecipes: RecetaRespuestaDTO[];
+  userSearch: Usuario[];
 
+  handleUsers: (users: Usuario | null) => void;
+  clearUsers: () => void;
   handleSearchQuery: (query: string) => void;
   handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => void;
   handleFavoritesRecipes: (recipes: RecetaRespuestaDTO[]) => void;
@@ -34,6 +38,7 @@ interface ProductsState {
 
 const useProductsStore = create<ProductsState>((set) => ({
   userRecipes: [],
+  userSearch: [],
   searchQuery: "",  
   productCategories: [
     {
@@ -197,7 +202,9 @@ const useProductsStore = create<ProductsState>((set) => ({
   })),
 
   handleUserRecipes: (recipes: RecetaRespuestaDTO[]) => set({ userRecipes: recipes }),
-
+  handleUsers: (user: Usuario | null) => set({ userSearch: user ? [user] : [] }),
+  clearUsers: () => set({ userSearch: [] }),
+  
   handleSearchQuery: (query: string) => set({ searchQuery: query }),
   handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => set({ searchRecipes: recipes }),
   handleFavoritesRecipes: (recipes: RecetaRespuestaDTO[]) => set({ favoritesRecipes: recipes }),

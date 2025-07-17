@@ -1,30 +1,31 @@
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { SearchBar } from "@/components/searchBar";
+import { UserCard } from "@/components/users/UserCard";
 import useProductsStore from "@/store/productsStore";
 import {
-    obtenerRecetasPorAliasUsuario,
-    obtenerRecetasPorIngrediente,
-    obtenerRecetasPorNoIngrediente,
-    obtenerRecetasPorTitulo,
-    RecetaRespuestaDTO,
+  obtenerRecetasPorIngrediente,
+  obtenerRecetasPorNoIngrediente,
+  obtenerRecetasPorTitulo,
+  RecetaRespuestaDTO
 } from "@/utils/api/recetas";
+import { obtenerUsuarioPorAlias, Usuario } from "@/utils/api/usuarios";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    Modal,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Modal,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const ProfileSearchScreen = () => {
-  const { searchRecipes, handleSearchRecipes } = useProductsStore();
+  const { searchRecipes, handleSearchRecipes, handleUsers, clearUsers, userSearch } = useProductsStore();
   const [modalVisible, setModalVisible] = useState(false);
   const [filtroSeleccionado, setFiltroSeleccionado] = useState<string>("receta");
   const [inputFiltro, setInputFiltro] = useState("");
@@ -33,19 +34,35 @@ const ProfileSearchScreen = () => {
 
   const { query } = useLocalSearchParams<{ query: string }>();
 
+  // useEffect(() => {
+    
+  // }, []);
+
   const aplicarFiltroHandler = async () => {
     setLoadingFiltro(true);
     setErrorFiltro(null);
 
     try {
       let recetas: RecetaRespuestaDTO[] = [];
+      let usuario: Usuario;
       const valorBusqueda = query?.trim() || "";
-
+      console.log({filtroSeleccionado});
+      
       if (filtroSeleccionado === "receta") {
         recetas = await obtenerRecetasPorTitulo(valorBusqueda);
-      } else if (filtroSeleccionado === "alias") {
-        recetas = await obtenerRecetasPorAliasUsuario(valorBusqueda);
-      } else if (filtroSeleccionado === "ingrediente_si" || filtroSeleccionado === "ingrediente_no") {
+        handleSearchRecipes(recetas);
+        // Limpiar usuarios cuando buscamos recetas
+        clearUsers();
+      }
+      
+      if (filtroSeleccionado === "alias") {
+        usuario = await obtenerUsuarioPorAlias(valorBusqueda);
+        handleUsers(usuario);
+        // Limpiar recetas cuando buscamos usuarios
+        handleSearchRecipes([]);
+      }
+      
+      if (filtroSeleccionado === "ingrediente_si" || filtroSeleccionado === "ingrediente_no") {
         if (!inputFiltro.trim()) {
           setErrorFiltro("Por favor ingresa el ingrediente.");
           setLoadingFiltro(false);
@@ -60,9 +77,11 @@ const ProfileSearchScreen = () => {
 
         const idsFiltradas = new Set(recetasFiltradas.map((r) => r.idReceta));
         recetas = recetasBase.filter((r) => idsFiltradas.has(r.idReceta));
+        handleSearchRecipes(recetas);
+        // Limpiar usuarios cuando buscamos recetas
+        clearUsers();
       }
 
-      handleSearchRecipes(recetas);
       setModalVisible(false);
       setInputFiltro("");
     } catch (error) {
@@ -73,12 +92,17 @@ const ProfileSearchScreen = () => {
     }
   };
 
+  // Determinar qué tipo de contenido mostrar
+  const mostrarUsuarios = filtroSeleccionado === "alias" && userSearch.length > 0;
+  const mostrarRecetas = !mostrarUsuarios && searchRecipes.length > 0;
+  const noHayResultados = !mostrarUsuarios && !mostrarRecetas;
+
   return (
     <View className="flex-1 bg-white">
       <SafeAreaView className="flex-1 pt-4">
         <StatusBar barStyle="dark-content" backgroundColor="white" />
 
-        <View className="px-4">
+        <View className="px-4 mt-8">
           <SearchBar />
 
           <Text className="text-xl font-bold text-gray-800 mb-4">
@@ -102,18 +126,26 @@ const ProfileSearchScreen = () => {
             </View>
 
             <Text className="text-sm text-gray-500">
-              {searchRecipes.length}{" "}
-              {searchRecipes.length === 1 ? "resultado" : "resultados"}
+              {mostrarUsuarios 
+                ? `${userSearch.length} ${userSearch.length === 1 ? "usuario" : "usuarios"}`
+                : `${searchRecipes.length} ${searchRecipes.length === 1 ? "resultado" : "resultados"}`
+              }
             </Text>
           </View>
         </View>
 
         <ScrollView className="flex-1 px-4 mb-4">
-          <View className="flex-row flex-wrap justify-between">
-            {searchRecipes.length === 0 ? (
-              <Text className="text-gray-500">No hay recetas encontradas.</Text>
-            ) : (
-              searchRecipes.map((recipe) => (
+          {mostrarUsuarios ? (
+            // Mostrar usuarios
+            <View>
+              {userSearch.map((user) => (
+                <UserCard key={user.idUsuario} user={user} />
+              ))}
+            </View>
+          ) : mostrarRecetas ? (
+            // Mostrar recetas
+            <View className="flex-row flex-wrap justify-between">
+              {searchRecipes.map((recipe) => (
                 <Link
                   href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
                   key={recipe.idReceta}
@@ -121,9 +153,14 @@ const ProfileSearchScreen = () => {
                 >
                   <RecipeCard {...recipe} />
                 </Link>
-              ))
-            )}
-          </View>
+              ))}
+            </View>
+          ) : (
+            // No hay resultados
+            <Text className="text-gray-500">
+              {noHayResultados ? "No hay resultados encontrados." : "Busca algo para ver resultados."}
+            </Text>
+          )}
         </ScrollView>
 
         <Modal
