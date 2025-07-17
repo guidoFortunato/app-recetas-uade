@@ -21,6 +21,7 @@ interface Props extends RecetaRespuestaDTO {
 export const RecipeCard = ({
   idReceta,
   titulo,
+  promedioValoracion,
   usuario,
   descripcion,
   cantidadPersonas,
@@ -40,7 +41,6 @@ export const RecipeCard = ({
     useProductsStore();
   const { user } = useAuthStore();
 
-  // Sincronizar el estado local con el estado global de favoritos
   useEffect(() => {
     const isInFavorites = favoritesRecipes.some(
       (recipe) => recipe.idReceta === idReceta
@@ -50,7 +50,7 @@ export const RecipeCard = ({
 
   const imageUrl =
     multimedia?.find((m) => m.tipo === "foto")?.url ??
-    "https://i.imgur.com/SmMtt1x.png"; // fallback por si no hay imagen
+    "https://i.imgur.com/SmMtt1x.png";
 
   const handleBookmark = async () => {
     if (!user?.idUsuario) {
@@ -62,14 +62,12 @@ export const RecipeCard = ({
       if (isBookmarked) {
         await quitarRecetaDeFavoritos(user.idUsuario, idReceta);
         removeFromFavorites(idReceta);
-
-        // TODO: mostrar un mensaje de que se desmarcó como favorita
       } else {
         await agregarRecetasFavoritas(user.idUsuario, idReceta);
-        // todo: poner disabled en el boton
         addToFavorites({
           idReceta,
           titulo,
+          promedioValoracion,
           usuario,
           descripcion,
           cantidadPersonas,
@@ -80,8 +78,6 @@ export const RecipeCard = ({
           categoria,
           fechaCreacion,
         });
-
-        // TODO: mostrar un mensaje de que se marcó como favorita
       }
     } catch (error) {
       console.error("Error al agregar receta a favoritos:", error);
@@ -94,10 +90,13 @@ export const RecipeCard = ({
         text: "Cancelar",
         style: "cancel",
       },
-      { text: "Eliminar", onPress: () => {
-        eliminarReceta(idReceta);
-        deleteUserRecipe(idReceta);
-      } },
+      {
+        text: "Eliminar",
+        onPress: () => {
+          eliminarReceta(idReceta);
+          deleteUserRecipe(idReceta);
+        },
+      },
     ]);
   };
 
@@ -112,7 +111,6 @@ export const RecipeCard = ({
           className="w-full h-32 rounded-t-xl"
           resizeMode="cover"
         />
-        {/* Botón de guardar */}
         {!isInProfile ? (
           <TouchableOpacity
             className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full items-center justify-center"
@@ -132,38 +130,17 @@ export const RecipeCard = ({
               onPress={() => alert("Botón de compartir")}
               activeOpacity={0.7}
             >
-              <Ionicons
-                name="open-outline"
-                size={16}
-                color="#000"
-              />
+              <Ionicons name="open-outline" size={16} color="#000" />
             </TouchableOpacity>
             <TouchableOpacity
               className="w-8 h-8 bg-white rounded-full items-center justify-center"
               onPress={handleDelete}
               activeOpacity={0.7}
             >
-              <Ionicons
-                name="trash-outline"
-                size={16}
-                color="#000"
-              />
+              <Ionicons name="trash-outline" size={16} color="#000" />
             </TouchableOpacity>
           </View>
         )}
-
-        {/* Botón de guardar */}
-        {/* <TouchableOpacity
-          className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full items-center justify-center"
-          onPress={handleBookmark}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name={isBookmarked ? iconFill : icon}
-            size={16}
-            color={isBookmarked ? "#000" : "#666"}
-          />
-        </TouchableOpacity> */}
       </View>
 
       <View className="p-3">
@@ -174,9 +151,14 @@ export const RecipeCard = ({
           {titulo}
         </Text>
 
-        <View className="flex-row items-center">
+        {/* Valoración promedio */}
+        <View className="flex-row items-center mt-1">
           <Ionicons name="star" size={14} color="#FFD700" />
-          <Text className="text-sm font-medium text-gray-700 ml-1">9.0</Text>
+          <Text className="text-sm font-medium text-gray-700 ml-1">
+            {typeof promedioValoracion === "number"
+              ? promedioValoracion.toFixed(1)
+              : "N/A"}
+          </Text>
         </View>
       </View>
     </View>

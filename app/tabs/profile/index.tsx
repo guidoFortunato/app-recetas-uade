@@ -98,7 +98,7 @@ const UserProfileScreen = () => {
               <View className="flex-row items-center justify-center">
                 <Image
                   source={{
-                    uri: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.canal-ar.com.ar%2Fnoticias%2Fimages%2Fc_uade_301019.jpg&f=1&nofb=1&ipt=067180079e59a9b16093adc3243eb6393c8906f263fad6f9efeebfe81d1c1fa2",
+                    uri: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.mos.cms.futurecdn.net%2FQiBMZTjEuDquSpLTJYvwxZ.jpg&f=1&nofb=1&ipt=7e24067fd457cbf8e177b4a2cb50e8a742d6f03c896769dea5982335285ba24b",
                   }}
                   className="w-20 h-20 rounded-full"
                   onError={() => setAvatarError(true)}

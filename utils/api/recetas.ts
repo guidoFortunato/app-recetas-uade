@@ -82,6 +82,7 @@ export interface ModificarRecetaDTO {
 export interface RecetaRespuestaDTO {
   idReceta: number;
   titulo: string;
+  promedioValoracion: number;
   descripcion: string;
   cantidadPersonas: number;
   publico: boolean;

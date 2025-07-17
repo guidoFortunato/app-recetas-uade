@@ -261,7 +261,11 @@ const RecipeDetailScreen = () => {
             <Text className="text-xl font-bold text-gray-800 mb-2">{recipe.titulo}</Text>
             <View className="flex-row items-center mb-4">
               <Ionicons name="star" size={16} color="#FFD700" />
-              <Text className="text-sm font-medium text-gray-700 ml-1">si</Text>
+              <Text className="text-sm font-medium text-gray-700 ml-1">
+                {typeof recipe.promedioValoracion === "number"
+                  ? recipe.promedioValoracion.toFixed(1)
+                  : "N/A"}
+              </Text>
             </View>
             <Text className="text-sm text-gray-600 leading-5">{recipe.descripcion}</Text>
           </View>
