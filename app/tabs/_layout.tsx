@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { useEffect } from "react";
 
+
 const TabsLayout = () => {
   const { user } = useAuthStore();
   const { handleFavoritesRecipes } = useProductsStore();
@@ -72,7 +73,7 @@ const TabsLayout = () => {
       />
 
       <Tabs.Screen
-        name="profile/index"
+        name="profile"
         options={{
           title: "Perfil",
           tabBarIcon: ({ color }) => (
