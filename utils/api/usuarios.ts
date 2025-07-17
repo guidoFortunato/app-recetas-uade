@@ -103,13 +103,21 @@ export const obtenerUsuarioPorId = (id: number): Promise<Usuario> =>
     });
 
 // 6. Obtener usuario por alias
-export const obtenerUsuarioPorAlias = (alias: string): Promise<Usuario> =>
+export const obtenerUsuarioPorAlias = (alias: string): Promise<Usuario[]> =>
   axios
     .get(`${API}/alias/${alias}`)
-    .then((res) => res.data)
+    .then((res) => {
+      // Si la respuesta es exitosa, devolver el usuario en un array
+      return [res.data];
+    })
     .catch((error) => {
-      //console.error("Error en obtener usuario por alias:", error);
-      throw error;
+      console.error("Error en obtener usuario por alias:", error);
+      // Si es un error 404 (usuario no encontrado), devolver array vacío
+      if (error.response && error.response.status === 404) {
+        return [];
+      }
+      // Para otros errores, lanzar el error original
+      return [];
     });
 
 // 7. Obtener usuario por email (query param)

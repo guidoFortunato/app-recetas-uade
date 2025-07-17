@@ -10,7 +10,7 @@ const RecetasApp = () => {
   const { setUser, user } = useAuthStore();
   const [loading, setLoading] = useState(true);
 
-  console.log({user});
+  // console.log({user});
 
   useEffect(() => {
     const loadAuth = async () => {
@@ -26,7 +26,7 @@ const RecetasApp = () => {
         const isExpired = Date.now() > expiresIn;
         const idUsuario = data?.idUsuario;
         const isAuthenticated = data?.isAuthenticated;
-        console.log({isExpired, idUsuario, isAuthenticated});
+        // console.log({isExpired, idUsuario, isAuthenticated});
         if (!isAuthenticated || !idUsuario || isExpired) {
           setLoading(false);
           return;

@@ -1,101 +1,109 @@
 import { RecipeCard } from "@/components/recipes/RecipeCard";
-import { SearchBar } from "@/components/searchBar";
+import { SearchBarWithFilter } from "@/components/searchBar";
 import { UserCard } from "@/components/users/UserCard";
 import useProductsStore from "@/store/productsStore";
 import {
   obtenerRecetasPorIngrediente,
   obtenerRecetasPorNoIngrediente,
   obtenerRecetasPorTitulo,
-  RecetaRespuestaDTO
 } from "@/utils/api/recetas";
-import { obtenerUsuarioPorAlias, Usuario } from "@/utils/api/usuarios";
-import { Ionicons } from "@expo/vector-icons";
-import { Link, useLocalSearchParams } from "expo-router";
+import { obtenerUsuarioPorAlias } from "@/utils/api/usuarios";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Modal,
   SafeAreaView,
   ScrollView,
   StatusBar,
   Text,
-  TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 
-const ProfileSearchScreen = () => {
-  const { searchRecipes, handleSearchRecipes, handleUsers, clearUsers, userSearch } = useProductsStore();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [filtroSeleccionado, setFiltroSeleccionado] = useState<string>("receta");
-  const [inputFiltro, setInputFiltro] = useState("");
-  const [loadingFiltro, setLoadingFiltro] = useState(false);
-  const [errorFiltro, setErrorFiltro] = useState<string | null>(null);
+const NotificationsScreen = () => {
+  const {
+    searchRecipes,
+    handleSearchRecipes,
+    handleUsers,
+    clearUsers,
+    userSearch,
+  } = useProductsStore();
+  const [loading, setLoading] = useState(false);
+  const [currentFilter, setCurrentFilter] = useState<string>("");
+  const [currentQuery, setCurrentQuery] = useState<string>("");
 
-  const { query } = useLocalSearchParams<{ query: string }>();
-
-  // useEffect(() => {
-    
-  // }, []);
-
-  const aplicarFiltroHandler = async () => {
-    setLoadingFiltro(true);
-    setErrorFiltro(null);
+  const handleSearch = async (query: string, filterType: string) => {
+    setLoading(true);
+    setCurrentFilter(filterType);
+    setCurrentQuery(query);
 
     try {
-      let recetas: RecetaRespuestaDTO[] = [];
-      let usuario: Usuario;
-      const valorBusqueda = query?.trim() || "";
-      console.log({filtroSeleccionado});
-      
-      if (filtroSeleccionado === "receta") {
-        recetas = await obtenerRecetasPorTitulo(valorBusqueda);
+      if (filterType === "receta") {
+        const recetas = await obtenerRecetasPorTitulo(query);
         handleSearchRecipes(recetas);
-        // Limpiar usuarios cuando buscamos recetas
         clearUsers();
-      }
-      
-      if (filtroSeleccionado === "alias") {
-        usuario = await obtenerUsuarioPorAlias(valorBusqueda);
-        handleUsers(usuario);
-        // Limpiar recetas cuando buscamos usuarios
+      } else if (filterType === "alias") {
+        const usuarios = await obtenerUsuarioPorAlias(query);
+        console.log({usuarios});
+        
+        // Usuarios encontrados (puede ser array vacío si no se encuentra)
+        handleUsers(usuarios);
         handleSearchRecipes([]);
-      }
-      
-      if (filtroSeleccionado === "ingrediente_si" || filtroSeleccionado === "ingrediente_no") {
-        if (!inputFiltro.trim()) {
-          setErrorFiltro("Por favor ingresa el ingrediente.");
-          setLoadingFiltro(false);
-          return;
-        }
+      } else if (
+        filterType === "ingrediente_si" ||
+        filterType === "ingrediente_no"
+      ) {
+        // Para ingredientes, primero obtenemos recetas por título y luego filtramos
+        const recetasBase = await obtenerRecetasPorTitulo(query);
 
-        let recetasBase = await obtenerRecetasPorTitulo(valorBusqueda);
-
-        const recetasFiltradas = filtroSeleccionado === "ingrediente_si"
-          ? await obtenerRecetasPorIngrediente(inputFiltro.trim())
-          : await obtenerRecetasPorNoIngrediente(inputFiltro.trim());
+        const recetasFiltradas =
+          filterType === "ingrediente_si"
+            ? await obtenerRecetasPorIngrediente(query)
+            : await obtenerRecetasPorNoIngrediente(query);
 
         const idsFiltradas = new Set(recetasFiltradas.map((r) => r.idReceta));
-        recetas = recetasBase.filter((r) => idsFiltradas.has(r.idReceta));
+        const recetas = recetasBase.filter((r) => idsFiltradas.has(r.idReceta));
+
         handleSearchRecipes(recetas);
-        // Limpiar usuarios cuando buscamos recetas
         clearUsers();
       }
-
-      setModalVisible(false);
-      setInputFiltro("");
     } catch (error) {
-      console.error(error);
-      setErrorFiltro("Hubo un error al aplicar el filtro.");
+      console.error("Error en la búsqueda:", error);
+      // Limpiar todos los datos cuando hay error
+      handleSearchRecipes([]);
+      clearUsers();
+      setCurrentQuery("");
+      setCurrentFilter("");
+      
+      // Mostrar mensaje específico según el tipo de error
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Hubo un error al realizar la búsqueda");
+      }
     } finally {
-      setLoadingFiltro(false);
+      setLoading(false);
     }
   };
 
   // Determinar qué tipo de contenido mostrar
-  const mostrarUsuarios = filtroSeleccionado === "alias" && userSearch.length > 0;
+  const mostrarUsuarios = currentFilter === "alias" && userSearch.length >= 0;
   const mostrarRecetas = !mostrarUsuarios && searchRecipes.length > 0;
-  const noHayResultados = !mostrarUsuarios && !mostrarRecetas;
+  const noHayResultados =
+    !mostrarUsuarios && !mostrarRecetas && currentQuery !== "";
+
+  // const getFilterLabel = (filterType: string) => {
+  //   switch (filterType) {
+  //     case "receta":
+  //       return "Nombre de Receta";
+  //     case "alias":
+  //       return "Usuarios";
+  //     case "ingrediente_si":
+  //       return "Con Ingrediente";
+  //     case "ingrediente_no":
+  //       return "Sin Ingrediente";
+  //     default:
+  //       return "";
+  //   }
+  // };
 
   return (
     <View className="flex-1 bg-white">
@@ -103,153 +111,96 @@ const ProfileSearchScreen = () => {
         <StatusBar barStyle="dark-content" backgroundColor="white" />
 
         <View className="px-4 mt-8">
-          <SearchBar />
+          <SearchBarWithFilter onSearch={handleSearch} />
 
-          <Text className="text-xl font-bold text-gray-800 mb-4">
-            {filtroSeleccionado === "alias" && query?.trim()
-              ? `Recetas de ${query.trim()}`
-              : "Recetas"}
-          </Text>
-
-          <View className="flex-row items-center justify-between mb-4">
-            <View className="flex-row">
-              <TouchableOpacity
-                className="flex-row items-center mr-4"
-                onPress={() => {
-                  setModalVisible(true);
-                  setErrorFiltro(null);
-                }}
-              >
-                <Text className="text-gray-700 mr-1">Filtrar</Text>
-                <Ionicons name="chevron-down-outline" size={16} color="#666" />
-              </TouchableOpacity>
-            </View>
-
-            <Text className="text-sm text-gray-500">
-              {mostrarUsuarios 
-                ? `${userSearch.length} ${userSearch.length === 1 ? "usuario" : "usuarios"}`
-                : `${searchRecipes.length} ${searchRecipes.length === 1 ? "resultado" : "resultados"}`
-              }
-            </Text>
-          </View>
-        </View>
-
-        <ScrollView className="flex-1 px-4 mb-4">
-          {mostrarUsuarios ? (
-            // Mostrar usuarios
-            <View>
-              {userSearch.map((user) => (
-                <UserCard key={user.idUsuario} user={user} />
-              ))}
-            </View>
-          ) : mostrarRecetas ? (
-            // Mostrar recetas
-            <View className="flex-row flex-wrap justify-between">
-              {searchRecipes.map((recipe) => (
-                <Link
-                  href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
-                  key={recipe.idReceta}
-                  className="mb-4 w-[48%]"
-                >
-                  <RecipeCard {...recipe} />
-                </Link>
-              ))}
-            </View>
-          ) : (
-            // No hay resultados
-            <Text className="text-gray-500">
-              {noHayResultados ? "No hay resultados encontrados." : "Busca algo para ver resultados."}
+          {/* Título dinámico */}
+          {currentQuery && (
+            <Text className="text-xl font-bold text-gray-800 mb-4">
+              {currentFilter === "alias"
+                ? `Usuario: ${currentQuery}`
+                : `Resultados para "${currentQuery}"`}
             </Text>
           )}
-        </ScrollView>
 
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(false);
-            setInputFiltro("");
-            setErrorFiltro(null);
-          }}
-        >
-          <View className="flex-1 justify-center items-center bg-gray-200 bg-opacity-50">
-            <View className="bg-white rounded-lg p-4 w-72">
-              <Text className="text-lg font-bold mb-3 text-center">Filtrar por:</Text>
+          {/* Contador de resultados */}
+          {currentQuery && (
+            <Text className="text-sm text-gray-500 mb-4">
+              {mostrarUsuarios
+                ? `${userSearch.length} ${
+                    userSearch.length === 1 ? "usuario" : "usuarios"
+                  } encontrado${userSearch.length === 1 ? "" : "s"}`
+                : `${searchRecipes.length} ${
+                    searchRecipes.length === 1 ? "resultado" : "resultados"
+                  } encontrado${searchRecipes.length === 1 ? "" : "s"}`}
+              {/* {currentFilter &&
+                ` por ${getFilterLabel(currentFilter).toLowerCase()}`} */}
+            </Text>
+          )}
+        </View>
 
-              <TouchableOpacity
-                className="py-2"
-                onPress={() => setFiltroSeleccionado("receta")}
-              >
-                <Text className={filtroSeleccionado === "receta" ? "font-bold text-black" : "text-gray-700"}>
-                  Nombre de Receta
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                className="py-2"
-                onPress={() => setFiltroSeleccionado("alias")}
-              >
-                <Text className={filtroSeleccionado === "alias" ? "font-bold text-black" : "text-gray-700"}>
-                  Recetas de Usuario
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                className="py-2"
-                onPress={() => setFiltroSeleccionado("ingrediente_si")}
-              >
-                <Text className={filtroSeleccionado === "ingrediente_si" ? "font-bold text-black" : "text-gray-700"}>
-                  Con Ingrediente
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                className="py-2"
-                onPress={() => setFiltroSeleccionado("ingrediente_no")}
-              >
-                <Text className={filtroSeleccionado === "ingrediente_no" ? "font-bold text-black" : "text-gray-700"}>
-                  Sin Ingrediente
-                </Text>
-              </TouchableOpacity>
-
-              {(filtroSeleccionado === "ingrediente_si" || filtroSeleccionado === "ingrediente_no") && (
-                <TextInput
-                  placeholder="Nombre del ingrediente..."
-                  value={inputFiltro}
-                  onChangeText={setInputFiltro}
-                  className="border border-gray-300 rounded-lg px-3 py-2 mt-4"
-                />
-              )}
-
-              {errorFiltro && (
-                <Text className="text-red-600 text-center mt-2">{errorFiltro}</Text>
-              )}
-
-              {loadingFiltro ? (
-                <ActivityIndicator size="small" color="#000" className="mt-4" />
-              ) : (
-                <TouchableOpacity
-                  onPress={aplicarFiltroHandler}
-                  className="bg-black rounded-lg py-3 mt-4"
-                >
-                  <Text className="text-white font-semibold text-center">Aplicar filtro</Text>
-                </TouchableOpacity>
-              )}
-
-              <TouchableOpacity
-                onPress={() => {
-                  setModalVisible(false);
-                  setInputFiltro("");
-                  setErrorFiltro(null);
-                }}
-                className="mt-2"
-              >
-                <Text className="text-center text-gray-500">Cancelar</Text>
-              </TouchableOpacity>
-            </View>
+        {/* Loading indicator */}
+        {loading && (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#000" />
+            <Text className="text-gray-600 mt-2">Buscando...</Text>
           </View>
-        </Modal>
+        )}
+
+        {/* Contenido */}
+        {!loading && (
+          <ScrollView className="flex-1 px-4 mb-4">
+            {mostrarUsuarios ? (
+              // Mostrar usuarios (puede estar vacío)
+              <View>
+                {userSearch.length > 0 ? (
+                  userSearch.map((user) => (
+                    <UserCard key={user.idUsuario} user={user} />
+                  ))
+                ) : currentQuery ? (
+                  // No hay usuarios encontrados
+                  <View className="flex-1 justify-center items-center py-20">
+                    <Text className="text-gray-500 text-center text-lg">
+                      No se encontraron usuarios para &quot;{currentQuery}&quot;
+                    </Text>
+                    <Text className="text-gray-400 text-center mt-2">
+                      Intenta con otro alias
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
+            ) : mostrarRecetas ? (
+              // Mostrar recetas
+              <View className="flex-row flex-wrap justify-between">
+                {searchRecipes.map((recipe) => (
+                  <RecipeCard key={recipe.idReceta} {...recipe} />
+                ))}
+              </View>
+            ) : noHayResultados ? (
+              // No hay resultados
+              <View className="flex-1 justify-center items-center py-20">
+                <Text className="text-gray-500 text-center text-lg">
+                  No se encontraron resultados para &quot;{currentQuery}&quot;
+                </Text>
+                <Text className="text-gray-400 text-center mt-2">
+                  Intenta con otros términos de búsqueda
+                </Text>
+              </View>
+            ) : (
+              // Estado inicial
+              <View className="flex-1 justify-center items-center py-20">
+                <Text className="text-gray-500 text-center text-lg">
+                  Selecciona un filtro y busca algo
+                </Text>
+                <Text className="text-gray-400 text-center mt-2">
+                  Encuentra recetas, usuarios o ingredientes
+                </Text>
+              </View>
+            )}
+          </ScrollView>
+        )}
       </SafeAreaView>
     </View>
   );
 };
 
-export default ProfileSearchScreen;
+export default NotificationsScreen;

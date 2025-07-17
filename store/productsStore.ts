@@ -24,7 +24,7 @@ interface ProductsState {
   userRecipes: RecetaRespuestaDTO[];
   userSearch: Usuario[];
 
-  handleUsers: (users: Usuario | null) => void;
+  handleUsers: (users: Usuario[] | null) => void;
   clearUsers: () => void;
   handleSearchQuery: (query: string) => void;
   handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => void;
@@ -202,7 +202,7 @@ const useProductsStore = create<ProductsState>((set) => ({
   })),
 
   handleUserRecipes: (recipes: RecetaRespuestaDTO[]) => set({ userRecipes: recipes }),
-  handleUsers: (user: Usuario | null) => set({ userSearch: user ? [user] : [] }),
+  handleUsers: (users: Usuario[] | null) => set({ userSearch: users || [] }),
   clearUsers: () => set({ userSearch: [] }),
   
   handleSearchQuery: (query: string) => set({ searchQuery: query }),
