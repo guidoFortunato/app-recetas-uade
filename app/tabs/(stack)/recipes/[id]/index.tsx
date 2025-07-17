@@ -24,6 +24,7 @@ import {
   View,
 } from "react-native";
 
+
 const RecipeDetailScreen = () => {
   const { user } = useAuthStore();
   const { id } = useLocalSearchParams();
@@ -308,12 +309,29 @@ const RecipeDetailScreen = () => {
           {/* Preparación */}
           <View className="px-4 mb-6">
             <Text className="text-lg font-bold text-gray-800 mb-4">Preparación</Text>
-            {recipe.pasos.map(paso => (
-              <View key={paso.numeroPaso} className="mb-4">
+            {recipe.pasos.map((paso) => (
+              <View key={paso.numeroPaso} className="mb-6">
                 <Text className="text-sm font-semibold text-gray-800 mb-2">
                   Paso {paso.numeroPaso}
                 </Text>
-                <Text className="text-sm text-gray-600 leading-5">{paso.descripcion}</Text>
+                <Text className="text-sm text-gray-600 leading-5 mb-2">{paso.descripcion}</Text>
+
+                {/* Mostrar imágenes si hay multimedia tipo IMAGEN */}
+                {paso.multimedia?.map((media, idx) =>
+                  media.tipo === "foto" ? (
+                    <Image
+                      key={idx}
+                      source={{ uri: media.url }}
+                      style={{
+                        width: "100%",
+                        height: 200,
+                        borderRadius: 10,
+                        marginBottom: 12,
+                      }}
+                      resizeMode="cover"
+                    />
+                  ) : null
+                )}
               </View>
             ))}
           </View>
