@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Alert,
   Image,
@@ -17,39 +17,44 @@ import { Link, useRouter } from "expo-router";
 
 import useProductsStore from "@/store/productsStore";
 import { obtenerRecetasPorUsuario } from "@/utils/api/recetas";
+import { useFocusEffect } from "@react-navigation/native";
 
 const UserProfileScreen = () => {
   const { user, logout } = useAuthStore();
   const router = useRouter();
 
   const [avatarError, setAvatarError] = useState(false);
-
   const { handleUserRecipes, userRecipes } = useProductsStore();
   const [loadingRecetas, setLoadingRecetas] = useState(false);
   const [errorRecetas, setErrorRecetas] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!user?.idUsuario) return;
+useFocusEffect(
+  useCallback(() => {
+    const cargarRecetasSiSonNuevas = async () => {
+      if (!user?.idUsuario) return;
 
-    const cargarRecetas = async () => {
       try {
-        setLoadingRecetas(true);
-        const recetasUsuario = await obtenerRecetasPorUsuario(user.idUsuario);
-        handleUserRecipes(recetasUsuario);
+        const recetasServidor = await obtenerRecetasPorUsuario(user.idUsuario);
+
+        const recetasActualesStr = JSON.stringify(userRecipes);
+        const recetasServidorStr = JSON.stringify(recetasServidor);
+
+        const hayDiferencias = recetasActualesStr !== recetasServidorStr;
+
+        if (hayDiferencias) {
+          handleUserRecipes(recetasServidor);
+        }
+
         setErrorRecetas(null);
       } catch (error) {
         setErrorRecetas((error as Error).message || "Error cargando recetas");
-      } finally {
-        setLoadingRecetas(false);
       }
     };
 
-    cargarRecetas();
-  }, [user?.idUsuario, handleUserRecipes]);
+    cargarRecetasSiSonNuevas();
+  }, [user?.idUsuario, userRecipes])
+);
 
-  if (loadingRecetas) {
-    return <Text>Cargando recetas...</Text>;
-  }
 
   const handleLogoutPress = () => {
     Alert.alert(
@@ -158,4 +163,3 @@ const UserProfileScreen = () => {
 };
 
 export default UserProfileScreen;
-

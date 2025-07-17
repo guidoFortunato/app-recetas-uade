@@ -38,7 +38,7 @@ interface Step {
 const CLOUD_NAME = "dr0h4tk9q";
 const UPLOAD_PRESET = "recetas_unsigned";
 
-const UNIDADES = ["unidad/es", "gramo/s", "cucharada/s", "cucharadita"];
+const UNIDADES = ["unidad/es", "grs", "cucharada/s", "cucharadita", "ml"];
 
 const CreateRecipeScreen = () => {
   const { user } = useAuth();
