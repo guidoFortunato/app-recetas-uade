@@ -7,10 +7,8 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 const RecetasApp = () => {
-  const { setUser, user } = useAuthStore();
+  const { setUser, user, isGuest } = useAuthStore();
   const [loading, setLoading] = useState(true);
-
-  // console.log({user});
 
   useEffect(() => {
     const loadAuth = async () => {
@@ -53,7 +51,7 @@ const RecetasApp = () => {
     );
   }
 
-  return user ? (
+  return user || isGuest ? (
     <Redirect href="/tabs/(stack)/home" />
   ) : (
     <Redirect href="/auth/login" />
