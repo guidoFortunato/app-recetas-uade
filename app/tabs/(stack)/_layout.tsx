@@ -39,6 +39,13 @@ const StackLayout = () => {
           animation: "slide_from_right",
         }}
       />
+      <Stack.Screen
+        name="searchIngrediente/index"
+        options={{
+          title: "",
+          animation: "slide_from_right",
+        }}
+      />
     </Stack>
   );
 };

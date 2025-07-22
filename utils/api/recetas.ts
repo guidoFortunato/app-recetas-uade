@@ -194,6 +194,7 @@ export const obtenerRecetasPorIngrediente = (
         .then((res) => res.data)
     )
     .catch((error) => {
+      console.log({ error });
       throw error;
     });
 

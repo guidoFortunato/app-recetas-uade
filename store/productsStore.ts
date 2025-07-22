@@ -16,11 +16,12 @@ interface Recipe {
   image: string;
 }
 interface ProductsState {
-  productCategories: ProductCategory[];
-  recipes: Recipe[];
-  searchRecipes: RecetaRespuestaDTO[];
-  searchQuery: string;
   favoritesRecipes: RecetaRespuestaDTO[];
+  productCategories: ProductCategory[];
+  searchRecipesByIngredient: RecetaRespuestaDTO[];
+  recipes: Recipe[];
+  searchQuery: string;
+  searchRecipes: RecetaRespuestaDTO[];
   userRecipes: RecetaRespuestaDTO[];
   userSearch: Usuario[];
 
@@ -30,6 +31,7 @@ interface ProductsState {
   clearUserRecipes: () => void;
   deleteUserRecipe: (recipeId: number) => void;
   handleFavoritesRecipes: (recipes: RecetaRespuestaDTO[]) => void;
+  handleSearchRecipesByIngredient: (recipes: RecetaRespuestaDTO[]) => void;
   handleSearchQuery: (query: string) => void;
   handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => void;
   handleUserRecipes: (recipes: RecetaRespuestaDTO[]) => void;
@@ -140,6 +142,7 @@ const useProductsStore = create<ProductsState>((set) => ({
     },
   ],
   searchRecipes: [],
+  searchRecipesByIngredient: [],
   recipes: [
     {
       id: 1,
@@ -201,7 +204,7 @@ const useProductsStore = create<ProductsState>((set) => ({
   deleteUserRecipe: (recipeId: number) => set((state) => ({
     userRecipes: state.userRecipes.filter(recipe => recipe.idReceta !== recipeId)
   })),
-
+  handleSearchRecipesByIngredient: (recipes: RecetaRespuestaDTO[]) => set({ searchRecipesByIngredient: recipes }),
   handleUserRecipes: (recipes: RecetaRespuestaDTO[]) => set({ userRecipes: recipes }),
   handleUsers: (users: Usuario[] | null) => set({ userSearch: users || [] }),
   clearUsers: () => set({ userSearch: [] }),
