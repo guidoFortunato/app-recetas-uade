@@ -396,39 +396,41 @@ const RecipeDetailScreen = () => {
           </View>
 
           {/* Agregar reseña */}
-          <View className="px-4 mb-32">
-            <Text className="text-lg font-bold text-gray-800 mb-4">
-              Agregar Reseña
-            </Text>
-            <View className="mb-4">
-              <Text className="text-gray-800 font-medium mb-2">
-                Descripción
+          {!isGuest && (
+            <View className="px-4 mb-32">
+              <Text className="text-lg font-bold text-gray-800 mb-4">
+                Agregar Reseña
               </Text>
-              <TextInput
-                value={reviewDescription}
-                onChangeText={setReviewDescription}
-                placeholder="Describe tu experiencia..."
-                multiline
-                numberOfLines={4}
-                className="border border-gray-300 rounded-lg px-3 py-3 text-gray-700 h-24"
-                placeholderTextColor="#9CA3AF"
-                textAlignVertical="top"
-              />
+              <View className="mb-4">
+                <Text className="text-gray-800 font-medium mb-2">
+                  Descripción
+                </Text>
+                <TextInput
+                  value={reviewDescription}
+                  onChangeText={setReviewDescription}
+                  placeholder="Describe tu experiencia..."
+                  multiline
+                  numberOfLines={4}
+                  className="border border-gray-300 rounded-lg px-3 py-3 text-gray-700 h-24"
+                  placeholderTextColor="#9CA3AF"
+                  textAlignVertical="top"
+                />
+              </View>
+              <View className="mb-4">
+                <Text className="text-gray-800 font-medium mb-2">
+                  Calificación
+                </Text>
+                {renderStars(userRating, 24, setUserRating)}
+              </View>
+              <TouchableOpacity
+                onPress={handleSubmitReview}
+                className="bg-black rounded-lg py-3 items-center"
+                activeOpacity={0.8}
+              >
+                <Text className="text-white font-semibold">Enviar</Text>
+              </TouchableOpacity>
             </View>
-            <View className="mb-4">
-              <Text className="text-gray-800 font-medium mb-2">
-                Calificación
-              </Text>
-              {renderStars(userRating, 24, setUserRating)}
-            </View>
-            <TouchableOpacity
-              onPress={handleSubmitReview}
-              className="bg-black rounded-lg py-3 items-center"
-              activeOpacity={0.8}
-            >
-              <Text className="text-white font-semibold">Enviar</Text>
-            </TouchableOpacity>
-          </View>
+          )}
         </ScrollView>
       </SafeAreaView>
     </View>
