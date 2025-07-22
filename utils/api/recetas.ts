@@ -30,9 +30,9 @@ export interface UsuarioBasicoDTO {
 }
 
 export interface IngredienteRecetaDTO {
-  nombre: string;
-  cantidad: number;
-  unidadMedida: string;
+    nombre:        string;
+    cantidad:      number;
+    unidadMedida:  string;
 }
 
 export interface IngredienteDTO {
@@ -74,7 +74,7 @@ export interface ModificarRecetaDTO {
   cantidadPersonas: number;
   publico: boolean;
   categoria: string;
-  ingredientes: IngredienteDTO[];
+  ingredientes: IngredienteRecetaDTO[];
   pasos: PasoRecetaDTO[];
   multimediaReceta: MultimediaRecetaDTO[];
 }
