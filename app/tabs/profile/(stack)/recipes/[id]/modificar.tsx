@@ -292,17 +292,6 @@ export default function ModificarRecetaScreen() {
             return;
         }
 
-        // 🗑️ Elimina todo este bloque:
-        // const ingredientesDTO = await Promise.all(
-        //   ingredientes.map(async (ing) => {
-        //     const res = await obtenerIngredientePorNombre(ing.nombre);
-        //     return {
-        //       idIngrediente: res.idIngrediente,
-        //       nombre:        ing.nombre,
-        //     };
-        //   })
-        // );
-
         // 2) Armar el DTO con el nuevo tipo de ingredientes
         const dto: ModificarRecetaDTO = {
             titulo,
