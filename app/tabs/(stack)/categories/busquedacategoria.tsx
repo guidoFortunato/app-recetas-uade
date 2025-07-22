@@ -1,4 +1,5 @@
 import { RecipeCard } from "@/components/recipes/RecipeCard";
+import useAuthStore from "@/store/authStore";
 import { obtenerRecetasPorCategoria, RecetaRespuestaDTO } from "@/utils/api/recetas";
 import { Link, useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -6,6 +7,7 @@ import { ScrollView, Text, View } from "react-native";
 
 const BusquedaCategoriaScreen = () => {
   const { categoryName } = useLocalSearchParams<{ categoryName: string }>();
+  const { isGuest } = useAuthStore();
   const navigation = useNavigation();
   const [recetas, setRecetas] = useState<RecetaRespuestaDTO[]>([]);
   const [loading, setLoading] = useState(false);
@@ -18,7 +20,12 @@ const BusquedaCategoriaScreen = () => {
       try {
         setLoading(true);
         const data = await obtenerRecetasPorCategoria(categoryName);
-        setRecetas(data);
+        if (isGuest) {
+          const recetasPublicas = data.filter((recipe) => recipe.publico === true);
+          setRecetas(recetasPublicas);
+        } else {
+          setRecetas(data);
+        }
         setError(null);
       } catch (err) {
         setError((err as Error).message);
