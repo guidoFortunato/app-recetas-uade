@@ -13,19 +13,23 @@ import {
   View
 } from "react-native";
 
+// import { useAuth } from "@/store/authStore";
+// import useProductsStore from "@/store/productsStore";
 import { useAuth } from "@/store/authStore";
 import { CategoriaReceta as CategoriaRecetaDTO, obtenerCategorias } from "@/utils/api/categoriaRecetas";
 import { EstadoReceta, obtenerPorEstadoYVisibilidad, RecetaRespuestaDTO } from "@/utils/api/recetas";
 
 const HomeScreen = () => {
   const router = useRouter();
+  const { isGuest } = useAuth();
 
   const [recetasSugeridas, setRecetasSugeridas] = useState<RecetaRespuestaDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { user } = useAuth();
-  console.log({user});
+  // const { user, isGuest } = useAuth();
+  // const { favoritesRecipes, userRecipes } = useProductsStore();
+  // console.log({user, isGuest, favoritesRecipes, userRecipes});
 
   const [categories, setCategories] = useState<{ name: string, image: string }[]>([]);
 
@@ -34,7 +38,13 @@ const HomeScreen = () => {
       try {
         setLoading(true);
         const data = await obtenerPorEstadoYVisibilidad(EstadoReceta.aprobada, true);
-        setRecetasSugeridas(data);
+        // console.log({data, isGuest});
+        if (isGuest) {
+          const recetasPublicas = data.filter( item => item.publico === true )
+          setRecetasSugeridas(recetasPublicas);          
+        } else {
+          setRecetasSugeridas(data);
+        }
         setError(null);
       } catch (e) {
         setError((e as Error).message);
@@ -43,7 +53,7 @@ const HomeScreen = () => {
       }
     };
     cargarRecetasSugeridas();
-  }, []);
+  }, [isGuest]);
 
   useEffect(() => {
     const fetchCategorias = async () => {
@@ -97,7 +107,7 @@ const HomeScreen = () => {
       <View className="px-4 pt-2">
         <SearchBar />
 
-        <View className="flex-row items-center mb-6 gap-4">
+        {/* <View className="flex-row items-center mb-6 gap-4">
           <TouchableOpacity className="flex-row items-center border border-gray-200 rounded-lg px-3 py-2">
             <Ionicons name="heart-outline" size={20} color="#374151" />
             <Text className="ml-1 text-gray-800 font-medium">Favoritos</Text>
@@ -112,7 +122,7 @@ const HomeScreen = () => {
             <Ionicons name="people-outline" size={20} color="#374151" />
             <Text className="ml-1 text-gray-800 font-medium">Seguidos</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
 
       <ScrollView className="flex-1">

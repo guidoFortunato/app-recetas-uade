@@ -44,7 +44,7 @@ export const RecipeCard = ({
   iconFill = "bookmark",
   isInProfile = false,
 }: Props) => {
-  const router = useRouter(); 
+  const router = useRouter();
   const [isBookmarked, setIsBookmarked] = useState(false);
 
   const {
@@ -53,7 +53,7 @@ export const RecipeCard = ({
     favoritesRecipes,
     deleteUserRecipe,
   } = useProductsStore();
-  const { user } = useAuthStore();
+  const { user, isGuest } = useAuthStore();
 
   useEffect(() => {
     const isInFavorites = favoritesRecipes.some(
@@ -125,40 +125,43 @@ export const RecipeCard = ({
           className="w-full h-32 rounded-t-xl"
           resizeMode="cover"
         />
-        {!isInProfile ? (
-          <TouchableOpacity
-            className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full items-center justify-center"
-            onPress={handleBookmark}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name={isBookmarked ? iconFill : icon}
-              size={16}
-              color={isBookmarked ? "#000" : "#666"}
-            />
-          </TouchableOpacity>
-        ) : (
-          <View className="absolute top-2 right-2 flex-row gap-1">
+
+        {!isGuest ? (
+          !isInProfile ? (
             <TouchableOpacity
-              className="w-8 h-8 bg-white rounded-full items-center justify-center"
-              onPress={() =>
-                router.push(
-                  `/tabs/profile/(stack)/recipes/${idReceta}/modificar`
-                )
-              }
+              className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full items-center justify-center"
+              onPress={handleBookmark}
               activeOpacity={0.7}
             >
-              <Ionicons name="open-outline" size={16} color="#000" />
+              <Ionicons
+                name={isBookmarked ? iconFill : icon}
+                size={16}
+                color={isBookmarked ? "#000" : "#666"}
+              />
             </TouchableOpacity>
-            <TouchableOpacity
-              className="w-8 h-8 bg-white rounded-full items-center justify-center"
-              onPress={handleDelete}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="trash-outline" size={16} color="#000" />
-            </TouchableOpacity>
-          </View>
-        )}
+          ) : (
+            <View className="absolute top-2 right-2 flex-row gap-1">
+              <TouchableOpacity
+                className="w-8 h-8 bg-white rounded-full items-center justify-center"
+                onPress={() =>
+                  router.push(
+                    `/tabs/profile/(stack)/recipes/${idReceta}/modificar`
+                  )
+                }
+                activeOpacity={0.7}
+              >
+                <Ionicons name="open-outline" size={16} color="#000" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="w-8 h-8 bg-white rounded-full items-center justify-center"
+                onPress={handleDelete}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="trash-outline" size={16} color="#000" />
+              </TouchableOpacity>
+            </View>
+          )
+        ) : null}
       </View>
 
       <View className="p-3 flex-1 justify-between">

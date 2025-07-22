@@ -7,15 +7,14 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 const RecetasApp = () => {
-  const { setUser, user } = useAuthStore();
+  const { setUser, user, isGuest } = useAuthStore();
   const [loading, setLoading] = useState(true);
-
-  console.log({user});
 
   useEffect(() => {
     const loadAuth = async () => {
       try {
         const stored = await AsyncStorage.getItem("auth-storage");
+        // console.log({stored});
         if (!stored) {
           setLoading(false);
           return;
@@ -26,7 +25,7 @@ const RecetasApp = () => {
         const isExpired = Date.now() > expiresIn;
         const idUsuario = data?.idUsuario;
         const isAuthenticated = data?.isAuthenticated;
-        console.log({isExpired, idUsuario, isAuthenticated});
+        // console.log({isExpired, idUsuario, isAuthenticated});
         if (!isAuthenticated || !idUsuario || isExpired) {
           setLoading(false);
           return;
@@ -53,7 +52,7 @@ const RecetasApp = () => {
     );
   }
 
-  return user ? (
+  return user || isGuest ? (
     <Redirect href="/tabs/(stack)/home" />
   ) : (
     <Redirect href="/auth/login" />

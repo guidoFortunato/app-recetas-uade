@@ -72,6 +72,7 @@ interface AuthState {
   isLoading: boolean;
   isPassRecovery: boolean;
   searchUsers: SearchUser[];
+  isGuest: boolean;
 
   // actions
   setUser: (user: AuthUser) => void;
@@ -82,6 +83,7 @@ interface AuthState {
   logout: () => void;
   setLoading: (loading: boolean) => void;
   checkAuthExpiration: () => boolean;
+  setIsGuest: (isGuest: boolean) => void;
 }
 
 const useAuthStore = create<AuthState>()(
@@ -93,8 +95,10 @@ const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       isPassRecovery: false,
+      isGuest: false,
 
       // actions
+      setIsGuest: (isGuest: boolean) => set({ isGuest }),
       setUser: (user: AuthUser) => set({ user }),
       login: (userData: LoginResponseDTO, expiresIn: number = 24 * 60 * 60 * 1000) => {
         const authUser: AuthUser = {
@@ -139,6 +143,7 @@ const useAuthStore = create<AuthState>()(
         set({
           user: null,
           isAuthenticated: false,
+          isGuest: false,
         }),
       
       setLoading: (loading: boolean) =>

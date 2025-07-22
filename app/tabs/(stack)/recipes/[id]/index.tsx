@@ -24,9 +24,8 @@ import {
   View,
 } from "react-native";
 
-
 const RecipeDetailScreen = () => {
-  const { user } = useAuthStore();
+  const { user, isGuest } = useAuthStore();
   const { id } = useLocalSearchParams();
   const navigation = useNavigation();
 
@@ -38,10 +37,13 @@ const RecipeDetailScreen = () => {
 
   // Nuevo estado: cantidad de personas y lista ajustada de ingredientes
   const [cantPersonas, setCantPersonas] = useState<number>(0);
-  const [ingredientesAjustados, setIngredientesAjustados] = useState<IngredienteRecetaDTO[]>([]);
+  const [ingredientesAjustados, setIngredientesAjustados] = useState<
+    IngredienteRecetaDTO[]
+  >([]);
 
   // Store para favoritos
-  const { removeFromFavorites, addToFavorites, favoritesRecipes } = useProductsStore();
+  const { removeFromFavorites, addToFavorites, favoritesRecipes } =
+    useProductsStore();
 
   // Estados para reseñas
   const [reviewDescription, setReviewDescription] = useState("");
@@ -51,7 +53,9 @@ const RecipeDetailScreen = () => {
   // Sincronizar favoritos
   useEffect(() => {
     if (recipe) {
-      const isInFav = favoritesRecipes.some(fav => fav.idReceta === recipe.idReceta);
+      const isInFav = favoritesRecipes.some(
+        (fav) => fav.idReceta === recipe.idReceta
+      );
       setIsBookmarked(isInFav);
     }
   }, [favoritesRecipes, recipe]);
@@ -122,16 +126,22 @@ const RecipeDetailScreen = () => {
     );
   }
 
-  const imagenReceta = recipe.multimedia.find(m => m.tipo === "foto")?.url;
+  const imagenReceta = recipe.multimedia.find((m) => m.tipo === "foto")?.url;
   const calcularTiempo = (fechaISO: string) => {
-    const diffDias = Math.floor((Date.now() - new Date(fechaISO).getTime()) / (1000 * 60 * 60 * 24));
+    const diffDias = Math.floor(
+      (Date.now() - new Date(fechaISO).getTime()) / (1000 * 60 * 60 * 24)
+    );
     if (diffDias === 0) return "Hoy";
     if (diffDias === 1) return "Ayer";
     return `Hace ${diffDias} días`;
   };
-  const renderStars = (rating: number, size = 16, onPress?: (r: number) => void) => (
+  const renderStars = (
+    rating: number,
+    size = 16,
+    onPress?: (r: number) => void
+  ) => (
     <View className="flex-row">
-      {[1,2,3,4,5].map(star => (
+      {[1, 2, 3, 4, 5].map((star) => (
         <TouchableOpacity
           key={star}
           onPress={() => onPress && onPress(star)}
@@ -156,7 +166,10 @@ const RecipeDetailScreen = () => {
       return;
     }
     try {
-      const ajustados = await multiplicarIngredientesReceta(recipe.idReceta, cantPersonas);
+      const ajustados = await multiplicarIngredientesReceta(
+        recipe.idReceta,
+        cantPersonas
+      );
       setIngredientesAjustados(ajustados);
     } catch (e) {
       console.error("Error al ajustar ingredientes", e);
@@ -169,7 +182,9 @@ const RecipeDetailScreen = () => {
     return (
       <View className="mb-6 p-4 bg-gray-50 rounded-lg">
         {renderStars(review.rating)}
-        <Text className="text-sm text-gray-600 leading-5 mb-3">{review.description}</Text>
+        <Text className="text-sm text-gray-600 leading-5 mb-3">
+          {review.description}
+        </Text>
         <View className="flex-row items-center">
           {!avatarError && review.avatar ? (
             <Image
@@ -183,7 +198,9 @@ const RecipeDetailScreen = () => {
             </View>
           )}
           <View>
-            <Text className="text-sm font-medium text-gray-800">{review.author}</Text>
+            <Text className="text-sm font-medium text-gray-800">
+              {review.author}
+            </Text>
             <Text className="text-xs text-gray-500">{review.timeAgo}</Text>
           </View>
         </View>
@@ -206,11 +223,21 @@ const RecipeDetailScreen = () => {
       alert("Reseña enviada correctamente");
       setReviewDescription("");
       setUserRating(0);
-      const nuevas = await obtenerValoracionesAprobadasPorReceta(recipe.idReceta);
+      const nuevas = await obtenerValoracionesAprobadasPorReceta(
+        recipe.idReceta
+      );
       setValoraciones(nuevas);
     } catch (e) {
       console.error("Error al enviar valoración", e);
       alert("Ocurrió un error al enviar la reseña");
+    }
+  };
+
+  const handleBookmark = () => {
+    if (isBookmarked) {
+      removeFromFavorites(recipe.idReceta);
+    } else {
+      addToFavorites(recipe);
     }
   };
 
@@ -243,23 +270,22 @@ const RecipeDetailScreen = () => {
           {/* Header */}
           <View className="px-4 py-4">
             <View className="flex-row items-center justify-between mb-2">
-              <Text className="text-xs text-gray-500">{recipe.usuario.alias}</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  isBookmarked
-                    ? removeFromFavorites(recipe.idReceta)
-                    : addToFavorites(recipe);
-                }}
-                activeOpacity={0.7}
-              >
-                <Ionicons
-                  name={isBookmarked ? "bookmark" : "bookmark-outline"}
-                  size={20}
-                  color={isBookmarked ? "#000" : "#666"}
-                />
-              </TouchableOpacity>
+              <Text className="text-xs text-gray-500">
+                {recipe.usuario.alias}
+              </Text>
+              {!isGuest && (
+                <TouchableOpacity onPress={handleBookmark} activeOpacity={0.7}>
+                  <Ionicons
+                    name={isBookmarked ? "bookmark" : "bookmark-outline"}
+                    size={20}
+                    color={isBookmarked ? "#000" : "#666"}
+                  />
+                </TouchableOpacity>
+              )}
             </View>
-            <Text className="text-xl font-bold text-gray-800 mb-2">{recipe.titulo}</Text>
+            <Text className="text-xl font-bold text-gray-800 mb-2">
+              {recipe.titulo}
+            </Text>
             <View className="flex-row items-center mb-4">
               <Ionicons name="star" size={16} color="#FFD700" />
               <Text className="text-sm font-medium text-gray-700 ml-1">
@@ -268,7 +294,9 @@ const RecipeDetailScreen = () => {
                   : "N/A"}
               </Text>
             </View>
-            <Text className="text-sm text-gray-600 leading-5">{recipe.descripcion}</Text>
+            <Text className="text-sm text-gray-600 leading-5">
+              {recipe.descripcion}
+            </Text>
           </View>
 
           {/* Cantidad de personas */}
@@ -277,7 +305,7 @@ const RecipeDetailScreen = () => {
             <View className="flex-row items-center">
               <TextInput
                 value={cantPersonas.toString()}
-                onChangeText={text => setCantPersonas(Number(text))}
+                onChangeText={(text) => setCantPersonas(Number(text))}
                 keyboardType="numeric"
                 className="border border-gray-300 rounded-lg px-3 py-2 w-24 mr-2"
                 placeholder="Cant."
@@ -295,7 +323,9 @@ const RecipeDetailScreen = () => {
 
           {/* Ingredientes ajustados */}
           <View className="px-4 mb-6">
-            <Text className="text-lg font-bold text-gray-800 mb-3">Ingredientes:</Text>
+            <Text className="text-lg font-bold text-gray-800 mb-3">
+              Ingredientes:
+            </Text>
             {ingredientesAjustados.map((ing, idx) => (
               <View key={idx} className="flex-row items-start mb-2">
                 <Text className="text-gray-600 mr-2">•</Text>
@@ -308,13 +338,17 @@ const RecipeDetailScreen = () => {
 
           {/* Preparación */}
           <View className="px-4 mb-6">
-            <Text className="text-lg font-bold text-gray-800 mb-4">Preparación</Text>
+            <Text className="text-lg font-bold text-gray-800 mb-4">
+              Preparación
+            </Text>
             {recipe.pasos.map((paso) => (
               <View key={paso.numeroPaso} className="mb-6">
                 <Text className="text-sm font-semibold text-gray-800 mb-2">
                   Paso {paso.numeroPaso}
                 </Text>
-                <Text className="text-sm text-gray-600 leading-5 mb-2">{paso.descripcion}</Text>
+                <Text className="text-sm text-gray-600 leading-5 mb-2">
+                  {paso.descripcion}
+                </Text>
 
                 {/* Mostrar imágenes si hay multimedia tipo IMAGEN */}
                 {paso.multimedia?.map((media, idx) =>
@@ -338,7 +372,9 @@ const RecipeDetailScreen = () => {
 
           {/* Reseñas */}
           <View className="px-4 mb-6">
-            <Text className="text-lg font-bold text-gray-800 mb-4">Reseñas</Text>
+            <Text className="text-lg font-bold text-gray-800 mb-4">
+              Reseñas
+            </Text>
             {valoraciones.length ? (
               valoraciones.map((v, i) => (
                 <ReviewCard
@@ -361,9 +397,13 @@ const RecipeDetailScreen = () => {
 
           {/* Agregar reseña */}
           <View className="px-4 mb-32">
-            <Text className="text-lg font-bold text-gray-800 mb-4">Agregar Reseña</Text>
+            <Text className="text-lg font-bold text-gray-800 mb-4">
+              Agregar Reseña
+            </Text>
             <View className="mb-4">
-              <Text className="text-gray-800 font-medium mb-2">Descripción</Text>
+              <Text className="text-gray-800 font-medium mb-2">
+                Descripción
+              </Text>
               <TextInput
                 value={reviewDescription}
                 onChangeText={setReviewDescription}
@@ -376,7 +416,9 @@ const RecipeDetailScreen = () => {
               />
             </View>
             <View className="mb-4">
-              <Text className="text-gray-800 font-medium mb-2">Calificación</Text>
+              <Text className="text-gray-800 font-medium mb-2">
+                Calificación
+              </Text>
               {renderStars(userRating, 24, setUserRating)}
             </View>
             <TouchableOpacity

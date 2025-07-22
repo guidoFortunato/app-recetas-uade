@@ -9,12 +9,14 @@ import {
 } from "react-native";
 
 import { useAuth } from "@/store/authStore";
+import useProductsStore from "@/store/productsStore";
 import type { LoginRequestDTO } from "@/utils/api/usuarios";
 import { login as loginApi } from "@/utils/api/usuarios"; // login API
 import { isValidEmail } from "@/utils/emailValidator";
 
 const AuthScreen = () => {
-  const { login } = useAuth(); // login del store para guardar usuario
+  const { login, setIsGuest } = useAuth(); // login del store para guardar usuario y setIsGuest para guardar si es invitado
+  const { clearFavorites, clearUserRecipes } = useProductsStore();
   const [aliasOEmail, setAliasOEmail] = useState("");
   const [contrasena, setContraseña] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,6 +44,7 @@ const AuthScreen = () => {
       const response = await loginApi(dto); // llamada a la API
 
       login(response); // guarda el usuario en el store
+      setIsGuest(false);
       router.replace("/tabs/(stack)/home"); // redirige a la home
     } catch (error: any) {
       if (error.response?.status === 401) {
@@ -53,6 +56,13 @@ const AuthScreen = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGuestLogin = () => {
+    clearFavorites();
+    clearUserRecipes();
+    setIsGuest(true);
+    router.replace("/tabs/(stack)/home");
   };
 
   return (
@@ -104,14 +114,20 @@ const AuthScreen = () => {
           </Text>
         </View>
         <View className="flex flex-row justify-center">
-          <Text className="text-sm text-neutral-500">
-            No tenes cuenta?
-          </Text>
+          <Text className="text-sm text-neutral-500">No tenés cuenta?</Text>
           <Text
             className="text-sm text-primary underline font-semibold ml-1"
             onPress={() => router.push("/auth/register")}
           >
             Regístrate
+          </Text>
+        </View>
+        <View className="flex flex-row justify-center">
+          <Text
+            className="text-sm text-primary underline font-semibold ml-1"
+            onPress={handleGuestLogin}
+          >
+            Ingresar como invitado
           </Text>
         </View>
       </View>

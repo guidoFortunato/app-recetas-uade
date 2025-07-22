@@ -23,7 +23,7 @@ import {
   View,
 } from "react-native";
 
-const ProfileSearchScreen = () => {
+const SearchScreen = () => {
   const { searchRecipes, handleSearchRecipes } = useProductsStore();
   const [modalVisible, setModalVisible] = useState(false);
   const [filtroSeleccionado, setFiltroSeleccionado] = useState<string>("receta");
@@ -218,4 +218,4 @@ const ProfileSearchScreen = () => {
   );
 };
 
-export default ProfileSearchScreen;
+export default SearchScreen;
