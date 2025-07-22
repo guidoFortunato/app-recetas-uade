@@ -14,6 +14,7 @@ const RecetasApp = () => {
     const loadAuth = async () => {
       try {
         const stored = await AsyncStorage.getItem("auth-storage");
+        // console.log({stored});
         if (!stored) {
           setLoading(false);
           return;

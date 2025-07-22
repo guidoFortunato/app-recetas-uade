@@ -24,16 +24,17 @@ interface ProductsState {
   userRecipes: RecetaRespuestaDTO[];
   userSearch: Usuario[];
 
-  handleUsers: (users: Usuario[] | null) => void;
+  addToFavorites: (recipe: RecetaRespuestaDTO) => void;
+  clearFavorites: () => void;
   clearUsers: () => void;
+  clearUserRecipes: () => void;
+  deleteUserRecipe: (recipeId: number) => void;
+  handleFavoritesRecipes: (recipes: RecetaRespuestaDTO[]) => void;
   handleSearchQuery: (query: string) => void;
   handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => void;
-  handleFavoritesRecipes: (recipes: RecetaRespuestaDTO[]) => void;
   handleUserRecipes: (recipes: RecetaRespuestaDTO[]) => void;
-  addToFavorites: (recipe: RecetaRespuestaDTO) => void;
+  handleUsers: (users: Usuario[] | null) => void;
   removeFromFavorites: (recipeId: number) => void;
-  clearFavorites: () => void;
-  deleteUserRecipe: (recipeId: number) => void;
 }
 
 const useProductsStore = create<ProductsState>((set) => ({
@@ -204,6 +205,7 @@ const useProductsStore = create<ProductsState>((set) => ({
   handleUserRecipes: (recipes: RecetaRespuestaDTO[]) => set({ userRecipes: recipes }),
   handleUsers: (users: Usuario[] | null) => set({ userSearch: users || [] }),
   clearUsers: () => set({ userSearch: [] }),
+  clearUserRecipes: () => set({ userRecipes: [] }),
   
   handleSearchQuery: (query: string) => set({ searchQuery: query }),
   handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => set({ searchRecipes: recipes }),
