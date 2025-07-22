@@ -13,21 +13,23 @@ import {
   View
 } from "react-native";
 
+// import { useAuth } from "@/store/authStore";
+// import useProductsStore from "@/store/productsStore";
 import { useAuth } from "@/store/authStore";
-import useProductsStore from "@/store/productsStore";
 import { CategoriaReceta as CategoriaRecetaDTO, obtenerCategorias } from "@/utils/api/categoriaRecetas";
 import { EstadoReceta, obtenerPorEstadoYVisibilidad, RecetaRespuestaDTO } from "@/utils/api/recetas";
 
 const HomeScreen = () => {
   const router = useRouter();
+  const { isGuest } = useAuth();
 
   const [recetasSugeridas, setRecetasSugeridas] = useState<RecetaRespuestaDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { user, isGuest } = useAuth();
-  const { favoritesRecipes, userRecipes } = useProductsStore();
-  console.log({user, isGuest, favoritesRecipes, userRecipes});
+  // const { user, isGuest } = useAuth();
+  // const { favoritesRecipes, userRecipes } = useProductsStore();
+  // console.log({user, isGuest, favoritesRecipes, userRecipes});
 
   const [categories, setCategories] = useState<{ name: string, image: string }[]>([]);
 
@@ -36,7 +38,13 @@ const HomeScreen = () => {
       try {
         setLoading(true);
         const data = await obtenerPorEstadoYVisibilidad(EstadoReceta.aprobada, true);
-        setRecetasSugeridas(data);
+        // console.log({data, isGuest});
+        if (isGuest) {
+          const recetasPublicas = data.filter( item => item.publico === true )
+          setRecetasSugeridas(recetasPublicas);          
+        } else {
+          setRecetasSugeridas(data);
+        }
         setError(null);
       } catch (e) {
         setError((e as Error).message);
@@ -45,7 +53,7 @@ const HomeScreen = () => {
       }
     };
     cargarRecetasSugeridas();
-  }, []);
+  }, [isGuest]);
 
   useEffect(() => {
     const fetchCategorias = async () => {

@@ -1,10 +1,11 @@
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { SearchBar } from "@/components/searchBar";
+import useAuthStore from "@/store/authStore";
 
 import useProductsStore from "@/store/productsStore";
 
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, Redirect } from "expo-router";
 
 import {
   SafeAreaView,
@@ -16,6 +17,11 @@ import {
 
 const FavoritesScreen = () => {
   const { favoritesRecipes } = useProductsStore();
+  const { isGuest } = useAuthStore();
+
+  if (isGuest) {
+    return <Redirect href="/" />; // o a donde quieras mandarlo
+  }
 
   return (
     <View className="flex-1 bg-white">

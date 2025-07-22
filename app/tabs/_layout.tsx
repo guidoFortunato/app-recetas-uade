@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 
 const TabsLayout = () => {
-  const { user } = useAuthStore();
+  const { user, isGuest } = useAuthStore();
   const { handleFavoritesRecipes } = useProductsStore();
 
   useEffect(() => {
@@ -57,15 +57,18 @@ const TabsLayout = () => {
         name="create/index"
         options={{
           title: "Crear receta",
+          href: isGuest ? null : undefined,
           tabBarIcon: ({ color }) => (
             <Ionicons size={28} name="add-outline" color={color} />
           ),
         }}
       />
+
       <Tabs.Screen
         name="favorites/index"
         options={{
           title: "Favoritos",
+          href: isGuest ? null : undefined,
           tabBarIcon: ({ color }) => (
             <Ionicons size={28} name="bookmark-outline" color={color} />
           ),
@@ -75,7 +78,7 @@ const TabsLayout = () => {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Perfil",
+          title: isGuest ? "Invitado" : "Perfil",
           tabBarIcon: ({ color }) => (
             <Ionicons size={28} name="person-outline" color={color} />
           ),
