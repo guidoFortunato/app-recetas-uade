@@ -1,5 +1,6 @@
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { SearchBar } from "@/components/searchBar";
+import useAuthStore from "@/store/authStore";
 import useProductsStore from "@/store/productsStore";
 import {
   obtenerRecetasPorTitulo,
@@ -19,30 +20,38 @@ import {
 
 const SearchScreen = () => {
   const { searchRecipes, handleSearchRecipes } = useProductsStore();
+  const { isGuest } = useAuthStore();
 
   const [loading, setLoading] = useState(false);
 
   const { query } = useLocalSearchParams<{ query: string }>();
 
   useEffect(() => {
+    const handleRecetas = async () => {
+      try {
+        setLoading(true);
+
+        const valorBusqueda = query?.trim() || "";
+        let recetas: RecetaRespuestaDTO[] = await obtenerRecetasPorTitulo(
+          valorBusqueda
+        );
+        if (isGuest) {
+          const recetasPublicas = recetas.filter(
+            (receta) => receta.publico === true
+          );
+          handleSearchRecipes(recetasPublicas);
+        } else {
+          handleSearchRecipes(recetas);
+        }
+      } catch (error) {
+        console.error(error);
+        handleSearchRecipes([]);
+      } finally {
+        setLoading(false);
+      }
+    };
     handleRecetas();
-  }, [query]);
-
-  const handleRecetas = async () => {
-    try {
-      setLoading(true);
-
-      const valorBusqueda = query?.trim() || "";
-      let recetas: RecetaRespuestaDTO[] = await obtenerRecetasPorTitulo(
-        valorBusqueda
-      );
-      handleSearchRecipes(recetas);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [query, isGuest, handleSearchRecipes]);
 
   if (loading) return <ActivityIndicator size="large" color="#0000ff" />;
   return (
