@@ -24,9 +24,7 @@ const NotificationsScreen = () => {
     clearUsers,
     exploreRecipes,
     handleExploreRecipes,
-    handleSearchRecipes,
     handleUsers,
-    searchRecipes,
     userSearch,
   } = useProductsStore();
   const [loading, setLoading] = useState(false);

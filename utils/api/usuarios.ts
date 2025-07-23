@@ -103,22 +103,57 @@ export const obtenerUsuarioPorId = (id: number): Promise<Usuario> =>
     });
 
 // 6. Obtener usuario por alias
-export const obtenerUsuarioPorAlias = (alias: string): Promise<Usuario[]> =>
-  axios
-    .get(`${API}/alias/${alias}`)
-    .then((res) => {
-      // Si la respuesta es exitosa, devolver el usuario en un array
-      return [res.data];
-    })
-    .catch((error) => {
-      console.error("Error en obtener usuario por alias:", error);
+export const obtenerUsuarioPorAlias = async (alias: string): Promise<Usuario[]> => {
+  try {
+    const respuesta = await fetch(`${API}/alias/${alias}`);
+    
+    // Si la respuesta no es exitosa
+    if (!respuesta.ok) {
       // Si es un error 404 (usuario no encontrado), devolver array vacío
-      if (error.response && error.response.status === 404) {
+      if (respuesta.status === 404) {
+        console.log(`Usuario con alias "${alias}" no encontrado`);
         return [];
       }
-      // Para otros errores, lanzar el error original
-      return [];
-    });
+      
+      // Para otros errores HTTP, lanzar un error con información detallada
+      throw new Error(`Error HTTP: ${respuesta.status} - ${respuesta.statusText}`);
+    }
+    
+    // Si la respuesta es exitosa, parsear los datos y devolver en array
+    const datosUsuario = await respuesta.json();
+    console.log('Usuario encontrado:', datosUsuario);
+    return [datosUsuario];
+    
+  } catch (error) {
+    // Manejo de errores de red, parsing, etc.
+    if (error instanceof Error) {
+      console.error(`Error al obtener usuario por alias "${alias}":`, error.message);
+    } else {
+      console.error(`Error inesperado al obtener usuario por alias "${alias}":`, error);
+    }
+    
+    // Re-lanzar el error para que el código que llama a esta función pueda manejarlo
+    throw error;
+  }
+};
+
+// export const obtenerUsuarioPorAlias = (alias: string): Promise<Usuario[]> =>
+//   axios
+//     .get(`${API}/alias/${alias}`)
+//     .then((res) => {
+    
+//       console.log({ res });
+//       return [res.data];
+//     })
+//     .catch((error) => {
+//       console.error("Error en obtener usuario por alias:", error);
+ 
+//       if (error.response && error.response.status === 404) {
+//         return [];
+//       }
+    
+//       return [];
+//     });
 
 // 7. Obtener usuario por email (query param)
 export const obtenerUsuarioPorEmail = (email: string): Promise<Usuario> =>

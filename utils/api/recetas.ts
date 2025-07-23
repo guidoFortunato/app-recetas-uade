@@ -30,9 +30,9 @@ export interface UsuarioBasicoDTO {
 }
 
 export interface IngredienteRecetaDTO {
-    nombre:        string;
-    cantidad:      number;
-    unidadMedida:  string;
+  nombre: string;
+  cantidad: number;
+  unidadMedida: string;
 }
 
 export interface IngredienteDTO {
@@ -173,43 +173,83 @@ export const valorarReceta = (
     });
 
 // Ingredientes
-export const obtenerIngredientePorNombre = (
+export const obtenerIngredientePorNombre = async (
   nombre: string
-): Promise<IngredienteDTO> =>
-  axios
-    .get(`${INGREDIENTES_API_URL}/nombre/${encodeURIComponent(nombre)}`)
-    .then((res) => res.data)
-    .catch((error) => {
-      throw error;
-    });
+): Promise<IngredienteDTO | null> => {
+  try {
+    const response = await fetch(`${INGREDIENTES_API_URL}/nombre/${encodeURIComponent(nombre)}`);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.log(`No se encontró el ingrediente "${nombre}"`);
+        return null;
+      }
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // Recetas por ingrediente
-export const obtenerRecetasPorIngrediente = (
+export const obtenerRecetasPorIngrediente = async (
   nombreIngrediente: string
-): Promise<RecetaRespuestaDTO[]> =>
-  obtenerIngredientePorNombre(nombreIngrediente)
-    .then((ingrediente) =>
-      axios
-        .get(`${API_URL}/ingrediente/${ingrediente.idIngrediente}`)
-        .then((res) => res.data)
-    )
-    .catch((error) => {
-      console.log({ error });
-      throw error;
-    });
+): Promise<RecetaRespuestaDTO[]> => {
+  try {
+    const ingrediente = await obtenerIngredientePorNombre(nombreIngrediente);
+    
+    if (!ingrediente) {
+      console.log(`No se encontró el ingrediente "${nombreIngrediente}"`);
+      return [];
+    }
+    
+    console.log({ ingrediente });
+    const response = await fetch(
+      `${API_URL}/ingrediente/${ingrediente.idIngrediente}`
+    );
 
-export const obtenerRecetasPorNoIngrediente = (
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.log(`No se encontraron recetas con el ingrediente "${nombreIngrediente}"`);
+        return [];
+      }
+      throw new Error(`Error HTTP: ${response.status}`);  
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log({ error });
+    throw error;
+  }
+};
+
+export const obtenerRecetasPorNoIngrediente = async (
   nombreIngrediente: string
-): Promise<RecetaRespuestaDTO[]> =>
-  obtenerIngredientePorNombre(nombreIngrediente)
-    .then((ingrediente) =>
-      axios
-        .get(`${API_URL}/ingrediente/${ingrediente.idIngrediente}/sin`)
-        .then((res) => res.data)
-    )
-    .catch((error) => {
-      throw error;
-    });
+): Promise<RecetaRespuestaDTO[]> => {
+  try {
+    const ingrediente = await obtenerIngredientePorNombre(nombreIngrediente);
+    
+    if (!ingrediente) {
+      console.log(`No se encontró el ingrediente "${nombreIngrediente}"`);
+      return [];
+    }
+    
+    const response = await fetch(`${API_URL}/ingrediente/${ingrediente.idIngrediente}/sin`);
+    
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // Recetas listas para intentar
 export const obtenerRecetasIntentarPorUsuario = (
@@ -277,7 +317,9 @@ export const obtenerPorEstadoYVisibilidad = (
       throw error;
     });
 
-export const obtenerPorEstado = (estado: EstadoReceta): Promise<RecetaRespuestaDTO[]> =>
+export const obtenerPorEstado = (
+  estado: EstadoReceta
+): Promise<RecetaRespuestaDTO[]> =>
   axios
     .get(`${API_URL}/estado/${estado}`)
     .then((res) => res.data)
@@ -285,7 +327,9 @@ export const obtenerPorEstado = (estado: EstadoReceta): Promise<RecetaRespuestaD
       throw error;
     });
 
-export const obtenerPorVisibilidad = (publico: boolean): Promise<RecetaRespuestaDTO[]> =>
+export const obtenerPorVisibilidad = (
+  publico: boolean
+): Promise<RecetaRespuestaDTO[]> =>
   axios
     .get(`${API_URL}/visibilidad/${publico}`)
     .then((res) => res.data)
@@ -325,7 +369,11 @@ export const existeRecetaUsuario = (
   titulo: string
 ): Promise<boolean> =>
   axios
-    .get(`${API_URL}/existe?idUsuario=${idUsuario}&titulo=${encodeURIComponent(titulo)}`)
+    .get(
+      `${API_URL}/existe?idUsuario=${idUsuario}&titulo=${encodeURIComponent(
+        titulo
+      )}`
+    )
     .then((res) => res.data)
     .catch((error) => {
       throw error;
@@ -353,4 +401,3 @@ export const multiplicarIngredientesReceta = (
     .catch((error) => {
       throw error;
     });
-
