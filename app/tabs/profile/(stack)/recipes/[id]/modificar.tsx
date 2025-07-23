@@ -1,3 +1,5 @@
+import { obtenerCategorias } from "@/utils/api/categoriaRecetas";
+import { obtenerIngredientes } from "@/utils/api/ingredientes";
 import {
   IngredienteRecetaDTO,
   ModificarRecetaDTO,
@@ -6,7 +8,6 @@ import {
   actualizarReceta,
   obtenerRecetaPorId,
 } from "@/utils/api/recetas";
-import { obtenerIngredientes } from "@/utils/api/ingredientes";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
@@ -18,16 +19,13 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
-  Switch,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
-import {obtenerCategorias} from "@/utils/api/categoriaRecetas";
-import { obtenerIngredientePorNombre } from "@/utils/api/ingredientes";
 
-
+import { Stack } from "expo-router";
 
 const CLOUD_NAME = "dr0h4tk9q";
 const UPLOAD_PRESET = "recetas_unsigned";
@@ -333,15 +331,7 @@ export default function ModificarRecetaScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="white" />
 
       {/* Header */}
-      <View className="px-4 py-4 border-b border-gray-200 flex-row items-center justify-between mt-5">
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back-outline" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text className="text-xl font-bold text-gray-800 text-center flex-1">
-          Modificar receta
-        </Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <Stack.Screen options={{ title: 'Modificar receta' }} />
 
       <ScrollView
         contentContainerStyle={{ padding: 16 }}
