@@ -4,15 +4,13 @@ import useAuthStore from "@/store/authStore";
 
 import useProductsStore from "@/store/productsStore";
 
-import { Ionicons } from "@expo/vector-icons";
 import { Link, Redirect } from "expo-router";
 
 import {
   SafeAreaView,
   StatusBar,
   Text,
-  TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 const FavoritesScreen = () => {
@@ -38,7 +36,7 @@ const FavoritesScreen = () => {
           </Text>
 
           {/* Filtrar y ordenar */}
-          <View className="flex-row items-center justify-between mb-4">
+          {/* <View className="flex-row items-center justify-between mb-4">
             <View className="flex-row">
               <TouchableOpacity className="flex-row items-center mr-4">
                 <Text className="text-gray-700 mr-1">Filtrar</Text>
@@ -50,7 +48,7 @@ const FavoritesScreen = () => {
                 <Ionicons name="chevron-down-outline" size={16} color="#666" />
               </TouchableOpacity>
             </View>
-          </View>
+          </View> */}
         </View>
 
         {/* Lista de recetas */}
