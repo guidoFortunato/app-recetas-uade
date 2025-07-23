@@ -34,6 +34,7 @@ interface ProductsState {
   handleSearchRecipesByIngredient: (recipes: RecetaRespuestaDTO[]) => void;
   handleSearchQuery: (query: string) => void;
   handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => void;
+  handleClearSearchRecipes: () => void;
   handleUserRecipes: (recipes: RecetaRespuestaDTO[]) => void;
   handleUsers: (users: Usuario[] | null) => void;
   removeFromFavorites: (recipeId: number) => void;
@@ -204,6 +205,7 @@ const useProductsStore = create<ProductsState>((set) => ({
   deleteUserRecipe: (recipeId: number) => set((state) => ({
     userRecipes: state.userRecipes.filter(recipe => recipe.idReceta !== recipeId)
   })),
+  handleClearSearchRecipes: () => set({ searchRecipes: [] }),
   handleSearchRecipesByIngredient: (recipes: RecetaRespuestaDTO[]) => set({ searchRecipesByIngredient: recipes }),
   handleUserRecipes: (recipes: RecetaRespuestaDTO[]) => set({ userRecipes: recipes }),
   handleUsers: (users: Usuario[] | null) => set({ userSearch: users || [] }),

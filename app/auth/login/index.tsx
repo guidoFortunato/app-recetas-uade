@@ -16,7 +16,7 @@ import { isValidEmail } from "@/utils/emailValidator";
 
 const AuthScreen = () => {
   const { login, setIsGuest } = useAuth(); // login del store para guardar usuario y setIsGuest para guardar si es invitado
-  const { clearFavorites, clearUserRecipes } = useProductsStore();
+  const { clearFavorites, clearUserRecipes, handleClearSearchRecipes } = useProductsStore();
   const [aliasOEmail, setAliasOEmail] = useState("");
   const [contrasena, setContraseña] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,6 +59,7 @@ const AuthScreen = () => {
   };
 
   const handleGuestLogin = () => {
+    handleClearSearchRecipes();
     clearFavorites();
     clearUserRecipes();
     setIsGuest(true);
