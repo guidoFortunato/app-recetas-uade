@@ -8,6 +8,7 @@ import {
   obtenerRecetasPorTitulo,
 } from "@/utils/api/recetas";
 import { obtenerUsuarioPorAlias } from "@/utils/api/usuarios";
+import { Link } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -20,10 +21,12 @@ import {
 
 const NotificationsScreen = () => {
   const {
-    searchRecipes,
+    clearUsers,
+    exploreRecipes,
+    handleExploreRecipes,
     handleSearchRecipes,
     handleUsers,
-    clearUsers,
+    searchRecipes,
     userSearch,
   } = useProductsStore();
   const [loading, setLoading] = useState(false);
@@ -38,15 +41,15 @@ const NotificationsScreen = () => {
     try {
       if (filterType === "receta") {
         const recetas = await obtenerRecetasPorTitulo(query);
-        handleSearchRecipes(recetas);
+        handleExploreRecipes(recetas);
         clearUsers();
       } else if (filterType === "alias") {
         const usuarios = await obtenerUsuarioPorAlias(query);
-        console.log({usuarios});
-        
+        console.log({ usuarios });
+
         // Usuarios encontrados (puede ser array vacío si no se encuentra)
         handleUsers(usuarios);
-        handleSearchRecipes([]);
+        handleExploreRecipes([]);
       } else if (
         filterType === "ingrediente_si" ||
         filterType === "ingrediente_no"
@@ -62,17 +65,17 @@ const NotificationsScreen = () => {
         const idsFiltradas = new Set(recetasFiltradas.map((r) => r.idReceta));
         const recetas = recetasBase.filter((r) => idsFiltradas.has(r.idReceta));
 
-        handleSearchRecipes(recetas);
+        handleExploreRecipes(recetas);
         clearUsers();
       }
     } catch (error) {
       console.error("Error en la búsqueda:", error);
       // Limpiar todos los datos cuando hay error
-      handleSearchRecipes([]);
+      handleExploreRecipes([]);
       clearUsers();
       setCurrentQuery("");
       setCurrentFilter("");
-      
+
       // Mostrar mensaje específico según el tipo de error
       if (error instanceof Error) {
         alert(error.message);
@@ -86,7 +89,7 @@ const NotificationsScreen = () => {
 
   // Determinar qué tipo de contenido mostrar
   const mostrarUsuarios = currentFilter === "alias" && userSearch.length >= 0;
-  const mostrarRecetas = !mostrarUsuarios && searchRecipes.length > 0;
+  const mostrarRecetas = !mostrarUsuarios && exploreRecipes.length > 0;
   const noHayResultados =
     !mostrarUsuarios && !mostrarRecetas && currentQuery !== "";
 
@@ -129,9 +132,9 @@ const NotificationsScreen = () => {
                 ? `${userSearch.length} ${
                     userSearch.length === 1 ? "usuario" : "usuarios"
                   } encontrado${userSearch.length === 1 ? "" : "s"}`
-                : `${searchRecipes.length} ${
-                    searchRecipes.length === 1 ? "resultado" : "resultados"
-                  } encontrado${searchRecipes.length === 1 ? "" : "s"}`}
+                : `${exploreRecipes.length} ${
+                    exploreRecipes.length === 1 ? "resultado" : "resultados"
+                  } encontrado${exploreRecipes.length === 1 ? "" : "s"}`}
               {/* {currentFilter &&
                 ` por ${getFilterLabel(currentFilter).toLowerCase()}`} */}
             </Text>
@@ -171,8 +174,13 @@ const NotificationsScreen = () => {
             ) : mostrarRecetas ? (
               // Mostrar recetas
               <View className="flex-row flex-wrap justify-between">
-                {searchRecipes.map((recipe) => (
-                  <RecipeCard key={recipe.idReceta} {...recipe} />
+                {exploreRecipes.map((recipe) => (
+                  <Link
+                    href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
+                    key={recipe.idReceta}
+                  >
+                    <RecipeCard key={recipe.idReceta} {...recipe} />
+                  </Link>
                 ))}
               </View>
             ) : noHayResultados ? (

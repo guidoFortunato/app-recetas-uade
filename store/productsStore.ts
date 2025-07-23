@@ -16,6 +16,7 @@ interface Recipe {
   image: string;
 }
 interface ProductsState {
+  // state
   favoritesRecipes: RecetaRespuestaDTO[];
   productCategories: ProductCategory[];
   searchRecipesByIngredient: RecetaRespuestaDTO[];
@@ -24,17 +25,21 @@ interface ProductsState {
   searchRecipes: RecetaRespuestaDTO[];
   userRecipes: RecetaRespuestaDTO[];
   userSearch: Usuario[];
+  exploreRecipes: RecetaRespuestaDTO[];
 
+  // actions
   addToFavorites: (recipe: RecetaRespuestaDTO) => void;
   clearFavorites: () => void;
   clearUsers: () => void;
   clearUserRecipes: () => void;
   deleteUserRecipe: (recipeId: number) => void;
+  handleExploreRecipes: (recipes: RecetaRespuestaDTO[]) => void;
   handleFavoritesRecipes: (recipes: RecetaRespuestaDTO[]) => void;
   handleSearchRecipesByIngredient: (recipes: RecetaRespuestaDTO[]) => void;
   handleSearchQuery: (query: string) => void;
   handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => void;
   handleClearSearchRecipes: () => void;
+  handleClearExploreRecipes: () => void;
   handleUserRecipes: (recipes: RecetaRespuestaDTO[]) => void;
   handleUsers: (users: Usuario[] | null) => void;
   removeFromFavorites: (recipeId: number) => void;
@@ -43,6 +48,7 @@ interface ProductsState {
 const useProductsStore = create<ProductsState>((set) => ({
   userRecipes: [],
   userSearch: [],
+  exploreRecipes: [],
   searchQuery: "",  
   productCategories: [
     {
@@ -205,13 +211,14 @@ const useProductsStore = create<ProductsState>((set) => ({
   deleteUserRecipe: (recipeId: number) => set((state) => ({
     userRecipes: state.userRecipes.filter(recipe => recipe.idReceta !== recipeId)
   })),
+  handleExploreRecipes: (recipes: RecetaRespuestaDTO[]) => set({ exploreRecipes: recipes }),
   handleClearSearchRecipes: () => set({ searchRecipes: [] }),
   handleSearchRecipesByIngredient: (recipes: RecetaRespuestaDTO[]) => set({ searchRecipesByIngredient: recipes }),
   handleUserRecipes: (recipes: RecetaRespuestaDTO[]) => set({ userRecipes: recipes }),
   handleUsers: (users: Usuario[] | null) => set({ userSearch: users || [] }),
   clearUsers: () => set({ userSearch: [] }),
   clearUserRecipes: () => set({ userRecipes: [] }),
-  
+  handleClearExploreRecipes: () => set({ exploreRecipes: [] }),
   handleSearchQuery: (query: string) => set({ searchQuery: query }),
   handleSearchRecipes: (recipes: RecetaRespuestaDTO[]) => set({ searchRecipes: recipes }),
   handleFavoritesRecipes: (recipes: RecetaRespuestaDTO[]) => set({ favoritesRecipes: recipes }),
