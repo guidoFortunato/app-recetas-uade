@@ -1,8 +1,8 @@
 import { CategoriaReceta } from "@/utils/api/categoriaRecetas";
 import axios from "axios";
 
-//const API_URL = "https://api-recetas-render.railway.internal/recetas";
-//const INGREDIENTES_API_URL = "https://api-recetas-render.onrender.com/ingredientes";
+// const API_URL = "https://api-recetas-yummly-app.onrender.com/recetas";
+// const INGREDIENTES_API_URL = "https://api-recetas-yummly-app.onrender.com/ingredientes";
 const API_URL = "http://10.0.2.2:8080/recetas";
 const INGREDIENTES_API_URL = "http://10.0.2.2:8080/ingredientes";
 
@@ -218,9 +218,8 @@ export const obtenerRecetasPorIngrediente = async (
       }
       throw new Error(`Error HTTP: ${response.status}`);  
     }
-
+    
     const data = await response.json();
-    console.log(data)
     return data;
   } catch (error) {
     console.log({ error });

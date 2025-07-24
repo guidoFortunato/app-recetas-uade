@@ -1,6 +1,6 @@
 import axios from "axios";
 
-//const API = "https://api-recetas-render.railway.internal/ingredientes";
+// const API = "https://api-recetas-yummly-app.onrender.com/ingredientes";
 const API = "http://10.0.2.2:8080/ingredientes";
 
 // Tipo que representa un ingrediente
