@@ -161,22 +161,7 @@ const HomeScreen = () => {
       <View className="px-4 pt-2">
         <SearchBar />
 
-        {/* <View className="flex-row items-center mb-6 gap-4">
-          <TouchableOpacity className="flex-row items-center border border-gray-200 rounded-lg px-3 py-2">
-            <Ionicons name="heart-outline" size={20} color="#374151" />
-            <Text className="ml-1 text-gray-800 font-medium">Favoritos</Text>
-          </TouchableOpacity>
 
-          <TouchableOpacity className="flex-row items-center border border-gray-200 rounded-lg px-3 py-2">
-            <Ionicons name="time-outline" size={20} color="#374151" />
-            <Text className="ml-1 text-gray-800 font-medium">Historial</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity className="flex-row items-center border border-gray-200 rounded-lg px-3 py-2">
-            <Ionicons name="people-outline" size={20} color="#374151" />
-            <Text className="ml-1 text-gray-800 font-medium">Seguidos</Text>
-          </TouchableOpacity>
-        </View> */}
       </View>
 
       <ScrollView className="flex-1">
@@ -199,13 +184,6 @@ const HomeScreen = () => {
                   : "cargando ingrediente..."}
               </Text>
             </View>
-            <Image
-              source={{
-                uri: "https://images.unsplash.com/photo-1628773822503-930a7eaecf80?w=120&h=120&fit=crop&crop=center",
-              }}
-              className="w-24 h-24 rounded-xl"
-              resizeMode="cover"
-            />
           </TouchableOpacity>
         </View>
 

@@ -53,17 +53,17 @@ const NotificationsScreen = () => {
         filterType === "ingrediente_no"
       ) {
         // Para ingredientes, primero obtenemos recetas por título y luego filtramos
-        const recetasBase = await obtenerRecetasPorTitulo(query);
+       //const recetasBase = await obtenerRecetasPorTitulo(query);
 
         const recetasFiltradas =
           filterType === "ingrediente_si"
             ? await obtenerRecetasPorIngrediente(query)
             : await obtenerRecetasPorNoIngrediente(query);
 
-        const idsFiltradas = new Set(recetasFiltradas.map((r) => r.idReceta));
-        const recetas = recetasBase.filter((r) => idsFiltradas.has(r.idReceta));
+        //const idsFiltradas = new Set(recetasFiltradas.map((r) => r.idReceta));
+        //const recetas = recetasBase.filter((r) => idsFiltradas.has(r.idReceta));
 
-        handleExploreRecipes(recetas);
+        handleExploreRecipes(recetasFiltradas);
         clearUsers();
       }
     } catch (error) {
@@ -171,7 +171,7 @@ const NotificationsScreen = () => {
               </View>
             ) : mostrarRecetas ? (
               // Mostrar recetas
-              <View className="flex-row flex-wrap justify-between">
+              <View className="flex-row flex-wrap justify-between gap-4">
                 {exploreRecipes.map((recipe) => (
                   <Link
                     href={`/tabs/(stack)/recipes/${recipe.idReceta}`}
