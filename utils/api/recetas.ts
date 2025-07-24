@@ -1,10 +1,10 @@
 import { CategoriaReceta } from "@/utils/api/categoriaRecetas";
 import axios from "axios";
 
-const API_URL = "https://api-recetas-yummly-app.onrender.com/recetas";
-const INGREDIENTES_API_URL = "https://api-recetas-yummly-app.onrender.com/ingredientes";
-//const API_URL = "http://10.0.2.2:8080/recetas";
-//const INGREDIENTES_API_URL = "http://10.0.2.2:8080/ingredientes";
+// const API_URL = "https://api-recetas-yummly-app.onrender.com/recetas";
+// const INGREDIENTES_API_URL = "https://api-recetas-yummly-app.onrender.com/ingredientes";
+const API_URL = "http://10.0.2.2:8080/recetas";
+const INGREDIENTES_API_URL = "http://10.0.2.2:8080/ingredientes";
 
 export enum TipoMultimedia {
   imagen = "foto",

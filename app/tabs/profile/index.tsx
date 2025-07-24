@@ -24,7 +24,7 @@ const UserProfileScreen = () => {
   const router = useRouter();
 
   const [avatarError, setAvatarError] = useState(false);
-  const { handleUserRecipes, userRecipes } = useProductsStore();
+  const { handleUserRecipes, userRecipes, handleClearExploreRecipes } = useProductsStore();
   const [loadingRecetas, setLoadingRecetas] = useState(false);
   const [errorRecetas, setErrorRecetas] = useState<string | null>(null);
 
@@ -67,6 +67,7 @@ const UserProfileScreen = () => {
           text: "Cerrar sesión",
           style: "destructive",
           onPress: () => {
+            handleClearExploreRecipes();
             logout();
             router.replace("/auth/login");
           },
@@ -77,6 +78,7 @@ const UserProfileScreen = () => {
   };
 
   const handleLoginPress = () => {
+    handleClearExploreRecipes();
     logout();
     router.replace("/auth/login");
   };
